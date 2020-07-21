@@ -3,8 +3,8 @@
 namespace App\DataFixtures;
 
 use Faker\Factory;
+use App\Entity\User;
 use App\Entity\Profil;
-use App\Entity\Utilisateurs;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -17,11 +17,11 @@ class AppFixtures extends Fixture
         
 
         // configurer la langue
-        $tab = ['administrateur','formateur','CM','apprenant'];
+        $tab = ['administrateur','formateur','CM'];
         // $tab = implode(",", $tab);
         $faker = Factory::create('fr_FR');
-        for ($p=0; $p < 4; $p++) { 
-            $users = new Utilisateurs();
+        for ($p=0; $p < 3; $p++) { 
+            $users = new User();
             $profil = new Profil();
             // profiles
             $profil->setLibelle($tab[$p]);
@@ -29,7 +29,6 @@ class AppFixtures extends Fixture
             // users
             $users->setPrenom($faker->firstname);
             $users->setNom($faker->lastname);
-            $users->setLogin($faker->name);
             $users->setPassword('password');
             $users->setEmail($faker->email);
             $users->setProfil($profil);
