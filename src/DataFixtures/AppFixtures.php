@@ -3,25 +3,27 @@
 namespace App\DataFixtures;
 
 use Faker\Factory;
+use App\Entity\User;
 use App\Entity\Profil;
-use App\Entity\Utilisateurs;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
 {
+    private $encoder;
+
+    public function __construct(UserPasswordEncoderInterface $encoder){
+        $this->encoder = $encoder;
+    }
     public function load(ObjectManager $manager)
     {
-        // $product = new Product();
-        // $manager->persist($product);
-        
-
         // configurer la langue
-        $tab = ['administrateur','formateur','CM','apprenant'];
+        $tab = ['admin','formateur','CM','apprenant'];
         // $tab = implode(",", $tab);
         $faker = Factory::create('fr_FR');
         for ($p=0; $p < 4; $p++) { 
-            $users = new Utilisateurs();
+            $users = new User();
             $profil = new Profil();
             // profiles
             $profil->setLibelle($tab[$p]);
@@ -29,10 +31,10 @@ class AppFixtures extends Fixture
             // users
             $users->setPrenom($faker->firstname);
             $users->setNom($faker->lastname);
-            $users->setLogin($faker->name);
-            $users->setPassword('password');
+            $users->setPassword($this->encoder->encodePassword($users, 'password'));
             $users->setEmail($faker->email);
             $users->setProfil($profil);
+            $users->setRoles($users->getRoles());
 
             // persist
             $manager->persist($profil);
