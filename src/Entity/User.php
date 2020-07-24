@@ -2,15 +2,27 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\UserRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource
+ * @ApiResource(
+ * collectionOperations={
+ *         "get",
+ *         "post"={"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent ajouter un utilisateur."}
+ *     },
+ * itemOperations={
+ *         "get",
+ *         "put"={"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent modifier un utilisateur."},
+ *         "delete" = {"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent supprimer un utilisateur."}
+ *     }
+ * )
  */
 class User implements UserInterface
 {
@@ -23,27 +35,32 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank(message="l'email ne peut pas être vide")
+     * @Assert\Regex(
+     * pattern="/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/",
+     * message="Email Invalide")
      */
     private $email;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="le password ne peut pas etre vide.")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="le prenom ne peut pas etre vide.")
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="le nom ne peut pas etre vide.")
      */
     private $nom;
 
@@ -52,6 +69,11 @@ class User implements UserInterface
      * @ORM\JoinColumn(nullable=false)
      */
     private $profil;
+
+    /**
+     * @ORM\Column(type="blob")
+     */
+    private $avatar;
 
     public function getId(): ?int
     {
@@ -87,15 +109,14 @@ class User implements UserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
+        $roles[] = 'ROLE_'.$this->profil->getLibelle();
+        
         return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
-
         return $this;
     }
 
@@ -163,6 +184,18 @@ class User implements UserInterface
     public function setProfil(?Profil $profil): self
     {
         $this->profil = $profil;
+
+        return $this;
+    }
+
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar($avatar): self
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }

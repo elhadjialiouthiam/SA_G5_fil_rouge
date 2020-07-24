@@ -2,18 +2,32 @@
 
 namespace App\Entity;
 
-use App\Repository\ProfilRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ProfilRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @ORM\Entity(repositoryClass=ProfilRepository::class)
- * @ApiResource
+ * @ApiResource(
+ * collectionOperations={
+ *         "get",
+ *         "post"={"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent ajouter un profil."}
+ *     },
+ * itemOperations={
+ *         "get",
+ *         "put"={"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent modifier un profil."},
+ *         "delete"={"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent supprimer un profil."}
+ *     }
+ * )
  */
 class Profil
 {
+    const PROFIL_TYPE = ['admin', 'formateur','CM','apprenant'];
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -23,6 +37,8 @@ class Profil
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Choice(choices=Profil::PROFIL_TYPE, message="choisir un bon profil.")
      */
     private $libelle;
 
