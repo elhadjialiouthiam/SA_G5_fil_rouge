@@ -19,14 +19,16 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         // configurer la langue
-        $tab = ['admin','formateur','CM','apprenant'];
+        $tab = ['admin','formateur','CM', "apprenant"];
         // $tab = implode(",", $tab);
         $faker = Factory::create('fr_FR');
-        for ($p=0; $p < 4; $p++) { 
-            $users = new User();
+        foreach($tab as $theProfil){
             $profil = new Profil();
+        for ($p=0; $p < 3; $p++) { 
+            $users = new User();
+         
             // profiles
-            $profil->setLibelle($tab[$p]);
+            $profil->setLibelle($theProfil);
             
             // users
             $users->setPrenom($faker->firstname);
@@ -42,4 +44,5 @@ class AppFixtures extends Fixture
         }
         $manager->flush();
     }
+}
 }

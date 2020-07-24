@@ -6,28 +6,47 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProfilRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *      attributes={
+ *              "security" = "is_granted('ROLE_ADMIN')",
+ *              "security_message" = "Seuls les admins ont le droit d'acces à ce ressource",
+ *       },
+ *             normalizationContext={"groups"={"profil:read"}},
+ *              denormalizationContext={"groups"={"profil:write"}}
+ * )
  */
 class Profil
 {
+
+    const ALLOWED_PROFILS = ["admin", "formateur", "CM"];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("profil:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"profil:read", "profil:write"})
+     * @Assert\NotBlank(message = "Le libelle ne peut pas etre vide")
+     * @Assert\Choice(choices=Profil::ALLOWED_PROFILS, message="Donner un profil valide")
      */
     private $libelle;
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="profil")
+     * @ApiSubresource
      */
     private $users;
 

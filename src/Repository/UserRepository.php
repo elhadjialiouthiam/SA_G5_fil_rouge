@@ -64,4 +64,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
     }
     */
+
+    public function findByProfil($value)
+    {
+        return $this->createQueryBuilder('u')
+        ->innerJoin('u.profil', 'p')
+        ->andWhere('p.libelle = :val')
+        ->setParameter('val', $value)
+        ->orderBy('u.id', 'ASC')
+        ->getQuery()
+        ->getResult()
+        ;
+    }
+
+    //mise en place de la fonction de suppression d'un apprenanant
+    //on recupere l'id de l'apprenant a supprimer
+    // $id = $this->createQueryBuilder('u')
+    //     ->innerJoin('u.profil', 'p')
+    //     ->where('p.libelle = :val')
+    //     ->setParameter('')
+
+    // public function deleteByProfil(){
+    //     ->
+    // }
+
+
 }
