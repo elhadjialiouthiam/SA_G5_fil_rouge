@@ -10,38 +10,97 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ApiResource(
  *      collectionOperations={
- *          "get",
+ *          "show_user"={
+ *              "method"="GET",
+ *              "route_name"="show_user"
+ *           },
+ *          "add_user"={
+ *              "method"="POST",
+ *               "route_name"="user",
+ *          },
  *          "get_role_admin"={
  *               "method"="GET",
  *               "path"="/admin/users" ,
  *               "security" = "is_granted('ROLE_ADMIN')",
  *               "security_message" = "Seuls les admins ont le droit d'acces à ce ressource"
  *               },
+ *         "post_role_admin"={
+ *               "method"="POST",
+ *               "path"="/admin/users" ,
+ *               "security" = "is_granted('ROLE_ADMIN')",
+ *               "security_message" = "Seuls les admins ont le droit d'acces à ce ressource"
+ *               },
  *           "get_apprenants"={
  *                  "method"="GET",
-*                   "path"="/apprenants" ,
-*                   "normalization_context"={"groups":"apprenant:read"},
-*                   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
-*                   "access_control_message"="Seuls les admins et les formateurs ont acces à ce ressource",
 *                   "route_name"="apprenant_liste",
-*
-*                   }
+*                   },
+*             "add_apprenant"={
+*                   "method" = "POST",
+*                   "security"="is_granted('ROLE_ADMIN')",
+*                   "security_message"="Seuls les admins et les formateurs ont acces à ce ressource",
+*                   "route_name" = "apprenant_add",
+*                  },
+*           "get_formateurs"={
+*                  "method"="GET",
+*                   "route_name"="formateur_liste",
+*                   },
+ *          "api_reset_pwd"={
+ *              "route_name"="api_reset_pwd",
+ *              "method"="POST",
+ *              "denormalization_context"={"groups":"reset:write"},
+ *          },
 *             },
-*         itemOperations={
-*                "delete_apprenant"={
+*           itemOperations={
+*                   "put",
+*                   "get",
+*              "archive_user" = { 
+*                       "method"="DELETE",
+*                       "route_name"="archive_user",
+*                       },
+*           "get_one_admin"={
+*               "method"="GET",
+*               "path"="/admin/users/{id}" ,
+*               }, 
+*           "put_role_admin"={
+*               "method"="PUT",
+*               "path"="/admin/users/{id}" ,
+*               },
+*            "getOne_apprenant"={
+ *                  "method"="GET",
+ *                  "path"="apprenants/{id}",
+ *                   "security" = "is_granted('ROLE_ADMIN') or is_granted('ROLE_CM) or object == user",
+*                   "security_message" = "Seul un admin ou un CM ou le detenteur peut modifier ses informations"
+*                   },
+*            "getOne_formateur"={
+ *                  "method"="GET",
+ *                  "path"="formateurs/{id}",
+ *                   "security" = "is_granted('ROLE_ADMIN') or is_granted('ROLE_CM') or object == user",
+*                   "security_message" = "Seul un admin ou un CM ou le detenteur peut modifier ses informations"
+*                   },
+*              "delete_apprenant"={
 *                   "method" = "DELETE",
-*                   "path"="/apprenants/{id<[0-9]+>}",
-*                  "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
-*                   "access_control_message"="Seuls les admins et les formateurs ont acces à ce ressource",
-*                    "route_name" = "apprenant_delete",
+*                   "route_name" = "apprenant_delete",
+*                   },
+*             "update_apprenant" = {
+*                   "method" = "PUT",
+*                   "path" = "/apprenants/{id}",
+*                   "security" = "is_granted('ROLE_ADMIN') or object == user",
+*                   "security_message" = "Seul un admin ou le detenteur a access à ces informations"
+*                   },
+*             "update_formateur" = {
+*                   "method" = "PUT",
+*                   "path" = "/formateurs/{id}",
+*                   "security" = "is_granted('ROLE_ADMIN') or object == user",
+*                   "security_message" = "Seul un admin ou le detenteur peut modifier ses informations"
 *                   }
-*                   
-*                  }
+*               },
+*           normalizationContext={"groups":{"apprenant:read"}},
  * )
  */
 class User implements UserInterface
@@ -50,7 +109,7 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"apprenant:read"})
+     * @Groups("apprenant:read")
      */
     private $id;
 
@@ -61,7 +120,7 @@ class User implements UserInterface
      * pattern="/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/",
      * message="Email Invalide"
      * )
-     * @Groups({"apprenant:read"})
+     * @Groups({"apprenant:read","reset:write"})
      */
     private $email;
 
@@ -80,7 +139,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le prenom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups({"apprenant:read"})
+     * @Groups("apprenant:read")
      */
     private $prenom;
 
@@ -88,16 +147,32 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le nom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups({"apprenant:read"})
+     * @Groups("apprenant:read")
      */
     private $nom;
 
     /**
      * @ORM\ManyToOne(targetEntity=Profil::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"apprenant:read"})
+     * @Groups("apprenant:read")
      */
     private $profil;
+
+    /**
+     * @ORM\Column(type="blob", nullable=true)
+     * @Groups("apprenant:read")
+     */
+    private $avatar;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ProfilDeSortie::class, inversedBy="users")
+     */
+    private $profilDeSortie;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $etat;
 
     public function getId(): ?int
     {
@@ -212,4 +287,41 @@ class User implements UserInterface
 
         return $this;
     }
+
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar($avatar): self
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getProfilDeSortie(): ?ProfilDeSortie
+    {
+        return $this->profilDeSortie;
+    }
+
+    public function setProfilDeSortie(?ProfilDeSortie $profilDeSortie): self
+    {
+        $this->profilDeSortie = $profilDeSortie;
+
+        return $this;
+    }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(?string $etat): self
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
 }

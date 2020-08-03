@@ -77,6 +77,35 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
     }
 
+    //afficher un user suivant son profil et son id
+    public function findOneByProfil($id, $profil): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->innerJoin('u.profil', 'p')
+            ->where('u.id = :val1')
+            ->andWhere('p.libelle = :val2')
+            ->setParameter('val1', $id)
+            ->setParameter('val2', $profil)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    //supprimer un user son profil et son id
+    // public function deleteOneByProfil($id): ?User
+    // {
+    //     return $this->createQueryBuilder('u')
+    //         ->delete('App\Entity\User', 'u')
+    //         // ->innerJoin('u.profil', 'p')
+    //         ->where('u.id = :val1')
+    //         // ->andWhere('p.libelle = :val2')
+    //         ->setParameter('val1', $id)
+    //         // ->setParameter('val2', $profil)
+    //         ->getQuery()
+    //         ->getOneOrNullResult()
+    //         ;
+    // }
+
     //mise en place de la fonction de suppression d'un apprenanant
     //on recupere l'id de l'apprenant a supprimer
     // $id = $this->createQueryBuilder('u')

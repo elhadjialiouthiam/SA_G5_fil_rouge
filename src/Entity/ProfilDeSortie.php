@@ -3,65 +3,52 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ProfilRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Repository\ProfilDeSortieRepository;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=ProfilRepository::class)
  * @ApiResource(
- *      attributes={
- *              "security" = "is_granted('ROLE_ADMIN')",
- *              "security_message" = "Seuls les admins ont le droit d'acces à ce ressource",
- *       },
- *     collectionOperations = {
+ *   attributes = {
+ *       "security":"is_granted('ROLE_ADMIN')",
+ *       "security_message":"Seuls les admins ont acces à cette ressource" 
+ *    },
+ *   collectionOperations={
  *      "post",
- *      "get",
- *          "show_profils"={
-*                   "method" = "GET",
-*                   "path"="/profils" ,
-*                   "route_name" = "show_profil",
-*                  },
- * },
- *     itemOperations = {
- *              "get",
- *               "archive_profil"={
-*                   "method" = "DELETE",
-*                   "route_name" = "archive_profil",
-*                  }
- *           },
- *             normalizationContext={"groups"={"profil:read"}},
- *              denormalizationContext={"groups"={"profil:write"}}
+ *      "show_profil_sortie" = {
+ *          "method"="GET",
+ *          "route_name"="show_profil_sortie"
+ *          }
+ *      },
+ *    itemOperations={
+ *          "get",
+ *          "put",
+ *        "archive_profil_sortie" = {
+ *          "method"="DELETE",
+ *          "route_name" = "archive_profilSortie"
+ * }
+ *      }
  * )
+ * @ORM\Entity(repositoryClass=ProfilDeSortieRepository::class)
  */
-class Profil
+class ProfilDeSortie
 {
-
-    const ALLOWED_PROFILS = ["admin", "formateur", "CM"];
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("profil:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"profil:read", "profil:write"})
-     * @Assert\NotBlank(message = "Le libelle ne peut pas etre vide")
-     * @Assert\Choice(choices=Profil::ALLOWED_PROFILS, message="Donner un profil valide")
      */
     private $libelle;
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="profil")
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="profilDeSortie")
      * @ApiSubresource
      */
     private $users;
@@ -73,7 +60,6 @@ class Profil
 
     public function __construct()
     {
-        $this->utilisateurs = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
 
@@ -94,11 +80,6 @@ class Profil
         return $this;
     }
 
-
-    public function __toString() {
-        return $this->libelle;
-    }
-
     /**
      * @return Collection|User[]
      */
@@ -111,7 +92,7 @@ class Profil
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
-            $user->setProfil($this);
+            $user->setProfilDeSortie($this);
         }
 
         return $this;
@@ -122,8 +103,8 @@ class Profil
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
             // set the owning side to null (unless already changed)
-            if ($user->getProfil() === $this) {
-                $user->setProfil(null);
+            if ($user->getProfilDeSortie() === $this) {
+                $user->setProfilDeSortie(null);
             }
         }
 
