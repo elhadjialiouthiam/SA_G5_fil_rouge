@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Profil;
+use App\Service\ArchiveService;
 use App\Repository\UserRepository;
 use App\Repository\ProfilRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,17 +14,19 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 
 class ApprenantController extends AbstractController
 {
     private $encoder;
-    public function __construct(UserPasswordEncoderInterface $encoder){
+    private $archiveService;
+    public function __construct(UserPasswordEncoderInterface $encoder, ArchiveService $archiveService){
         $this->encoder = $encoder;
+        $this->archiveService = $archiveService;
     }    
 
     /**
@@ -41,7 +44,7 @@ class ApprenantController extends AbstractController
 */
     public function showApprenants(UserRepository $repository)
     {
-        $apprenants = $repository->findByProfil('apprenant');
+        $apprenants = $repository->findByProfil("apprenant");
         return $this->json($apprenants,Response::HTTP_OK,);
     }
 
@@ -94,12 +97,10 @@ public function add(EntityManagerInterface $manager, Request $request, Serialize
 
 public function delete(User $apprenant, EntityManagerInterface $manager){
     if($apprenant->getProfil()=="apprenant"){
-        $manager->remove($apprenant);
-        $manager->flush();
-        return $this->json('success',Response::HTTP_OK,);
+        return $this->archiveService->archive($apprenant);
     }
     else{
-        return $this->json("La ressource que vous tentez de supprimer n'est pas un apprenant",Response::HTTP_OK,);
+        return $this->json("La ressource que vous tentez d'archiver n'est pas un apprenant",Response::HTTP_OK,);
     }
 }
 

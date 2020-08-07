@@ -31,13 +31,14 @@ class ApiResetPwdController extends AbstractController
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
     }
+
     /**
      * @Route(
      * path="/api/reset_password", 
      * name="api_reset_pwd",
      * methods={"POST"},
      * defaults={
-    * "_controller"="\app\ControllerApprenantController::request",
+     * "_controller"="\app\ControllerApprenantController::request",
     * "_api_resource_class"=User::class,
     * "_api_collection_operation_name"="api_reset_pwd"
     * }
@@ -48,36 +49,12 @@ class ApiResetPwdController extends AbstractController
         $requete = $request->getContent();
         $user = $serializer->deserialize($requete,User::class,"json");
         $email = $user->getEmail();
-        // $email = new Response($email);
-        // $user = $repo->findBy([
-        //     "email"
-        // ])
         return $this->processSendingPasswordResetEmail(
             $email,
             $mailer
         );
-    
-    //  return $email;
-        // return $this->json($requet->{"email"},Response::HTTP_OK,);
-
     }
 
-    /**
-     * Confirmation page after a user has requested a password reset.
-     *
-     * @Route("/check-email", name="app_check_email")
-     */
-    // public function checkEmail(): Response
-    // {
-    //     // We prevent users from directly accessing this page
-    //     if (!$this->canCheckEmail()) {
-    //         return $this->redirectToRoute('app_forgot_password_request');
-    //     }
-
-    //     return $this->render('reset_password/check_email.html.twig', [
-    //         'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
-    //     ]);
-    // }
 
 /**
      * Validates and process the reset URL that the user clicked in their email.
@@ -166,7 +143,6 @@ class ApiResetPwdController extends AbstractController
         //     //     $e->getReason()
         //     // ));
             return new Response("Erreur survenue au cours de la reinitialisation du mot de passe");
-            // return $this->redirectToRoute('app_check_email');
         }
 
         $email = (new TemplatedEmail())

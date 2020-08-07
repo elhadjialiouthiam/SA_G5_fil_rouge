@@ -65,12 +65,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
     */
 
-    public function findByProfil($value)
+    //fonction permattant de trouver un ensemble de users non archivés suivant un profil donné
+    public function findByProfil($profil)
     {
         return $this->createQueryBuilder('u')
         ->innerJoin('u.profil', 'p')
-        ->andWhere('p.libelle = :val')
-        ->setParameter('val', $value)
+        ->where('p.libelle = :val1')
+        ->andWhere('u.etat IS NULL')
+        ->setParameter('val1', $profil)
         ->orderBy('u.id', 'ASC')
         ->getQuery()
         ->getResult()

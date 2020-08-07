@@ -15,24 +15,17 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ApiResource(
+ * denormalizationContext={"groups":{"user:write"}},
  *      collectionOperations={
- *          "show_user"={
+ *           "show_user"={
  *              "method"="GET",
- *              "route_name"="show_user"
- *           },
- *          "add_user"={
- *              "method"="POST",
- *               "route_name"="user",
- *          },
- *          "get_role_admin"={
- *               "method"="GET",
- *               "path"="/admin/users" ,
+ *              "route_name"="show_user",
  *               "security" = "is_granted('ROLE_ADMIN')",
  *               "security_message" = "Seuls les admins ont le droit d'acces à ce ressource"
  *               },
- *         "post_role_admin"={
- *               "method"="POST",
- *               "path"="/admin/users" ,
+ *          "add_user"={
+ *              "method"="POST",
+ *              "route_name"="add_user",
  *               "security" = "is_granted('ROLE_ADMIN')",
  *               "security_message" = "Seuls les admins ont le droit d'acces à ce ressource"
  *               },
@@ -45,6 +38,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 *                   "security"="is_granted('ROLE_ADMIN')",
 *                   "security_message"="Seuls les admins et les formateurs ont acces à ce ressource",
 *                   "route_name" = "apprenant_add",
+*                   "denormalization_context"={"groups":"apprenant:write"}
 *                  },
 *           "get_formateurs"={
 *                  "method"="GET",
@@ -57,20 +51,18 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
  *          },
 *             },
 *           itemOperations={
-*                   "put",
-*                   "get",
-*              "archive_user" = { 
-*                       "method"="DELETE",
-*                       "route_name"="archive_user",
-*                       },
-*           "get_one_admin"={
+*           "get_one_user"={
 *               "method"="GET",
 *               "path"="/admin/users/{id}" ,
 *               }, 
-*           "put_role_admin"={
+*           "put_one_user"={
 *               "method"="PUT",
 *               "path"="/admin/users/{id}" ,
 *               },
+*           "archive_user"={
+    *             "method"="DELETE",
+    *               "route_name"="archive_user"
+*},
 *            "getOne_apprenant"={
  *                  "method"="GET",
  *                  "path"="apprenants/{id}",
@@ -78,9 +70,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 *                   "security_message" = "Seul un admin ou un CM ou le detenteur peut modifier ses informations"
 *                   },
 *            "getOne_formateur"={
- *                  "method"="GET",
- *                  "path"="formateurs/{id}",
- *                   "security" = "is_granted('ROLE_ADMIN') or is_granted('ROLE_CM') or object == user",
+*                  "method"="GET",
+*                  "path"="formateurs/{id}",
+*                   "security" = "is_granted('ROLE_ADMIN') or is_granted('ROLE_CM') or object == user",
 *                   "security_message" = "Seul un admin ou un CM ou le detenteur peut modifier ses informations"
 *                   },
 *              "delete_apprenant"={
@@ -99,8 +91,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 *                   "security" = "is_granted('ROLE_ADMIN') or object == user",
 *                   "security_message" = "Seul un admin ou le detenteur peut modifier ses informations"
 *                   }
-*               },
-*           normalizationContext={"groups":{"apprenant:read"}},
+*               }, 
  * )
  */
 class User implements UserInterface
@@ -109,7 +100,6 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("apprenant:read")
      */
     private $id;
 
@@ -120,7 +110,7 @@ class User implements UserInterface
      * pattern="/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/",
      * message="Email Invalide"
      * )
-     * @Groups({"apprenant:read","reset:write"})
+     * @Groups({"reset:write","user:write","apprenant:write"})
      */
     private $email;
 
@@ -132,6 +122,7 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups({"user:write","apprenant:write"})
      */
     private $password;
 
@@ -139,7 +130,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le prenom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups("apprenant:read")
+     * @Groups({"user:write","apprenant:write"})
      */
     private $prenom;
 
@@ -147,25 +138,26 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le nom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups("apprenant:read")
+     * @Groups({"user:write","apprenant:write"})
      */
     private $nom;
 
     /**
      * @ORM\ManyToOne(targetEntity=Profil::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups("apprenant:read")
+     * @Groups({"user:write"})
      */
     private $profil;
 
     /**
      * @ORM\Column(type="blob", nullable=true)
-     * @Groups("apprenant:read")
+     * @Groups({"user:write","apprenant:write"})
      */
     private $avatar;
 
     /**
      * @ORM\ManyToOne(targetEntity=ProfilDeSortie::class, inversedBy="users")
+     * @Groups({"apprenant:write", "user:write"})
      */
     private $profilDeSortie;
 

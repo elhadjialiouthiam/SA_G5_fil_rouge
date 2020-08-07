@@ -14,6 +14,7 @@ class ArchiveService
         $this->manager = $manager;
         $this->serializer = $serializer;
     }
+    
     public function archive($object){
         $object->setEtat('archive');
         $this->manager->flush();
