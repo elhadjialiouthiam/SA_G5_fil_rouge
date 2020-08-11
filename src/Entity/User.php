@@ -2,28 +2,26 @@
 
 namespace App\Entity;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use Doctrine\ORM\Mapping\InheritanceType;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource(
- * collectionOperations={
- *         "get",
- *         "post"={"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent ajouter un utilisateur."}
- *     },
- * itemOperations={
- *         "get",
- *         "put"={"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent modifier un utilisateur."},
- *         "delete" = {"security"="is_granted('ROLE_admin')", "security_message"="seul les admins peuvent supprimer un utilisateur."}
- *     }
- * )
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\DiscriminatorMap({"user" = "User", "admin" = "Admin", "formateur" = "Formateur", "apprenant" = "Apprenant"})
+ * @ApiResource()
  */
+
 class User implements UserInterface
 {
     /**
@@ -39,6 +37,7 @@ class User implements UserInterface
      * @Assert\Regex(
      * pattern="/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/",
      * message="Email Invalide")
+     * @Groups({"user:read","promos:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
      */
     private $email;
 
@@ -55,25 +54,33 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="le prenom ne peut pas etre vide.")
+     *  @Groups({"user:read","promos:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="le nom ne peut pas etre vide.")
+     * @Groups({"user:read","promos:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
      */
     private $nom;
 
     /**
      * @ORM\ManyToOne(targetEntity=Profil::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
+     * @ApiSubresource()
      */
     private $profil;
 
-    /**
-     * @ORM\Column(type="blob")
-     */
+    // /**
+    //  * @ORM\Column(type="blob")
+    //  */
     private $avatar;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $etat;
 
     public function getId(): ?int
     {
@@ -196,6 +203,18 @@ class User implements UserInterface
     public function setAvatar($avatar): self
     {
         $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(string $etat): self
+    {
+        $this->etat = $etat;
 
         return $this;
     }
