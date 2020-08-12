@@ -16,83 +16,47 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ApiResource(
  * denormalizationContext={"groups":{"user:write"}},
- *      collectionOperations={
- *           "show_user"={
- *              "method"="GET",
- *              "route_name"="show_user",
- *               "security" = "is_granted('ROLE_ADMIN')",
- *               "security_message" = "Seuls les admins ont le droit d'acces à ce ressource"
- *               },
- *          "add_user"={
- *              "method"="POST",
- *              "route_name"="add_user",
- *               "security" = "is_granted('ROLE_ADMIN')",
- *               "security_message" = "Seuls les admins ont le droit d'acces à ce ressource"
- *               },
- *           "get_apprenants"={
- *                  "method"="GET",
-*                   "route_name"="apprenant_liste",
-*                   },
-*             "add_apprenant"={
-*                   "method" = "POST",
-*                   "security"="is_granted('ROLE_ADMIN')",
-*                   "security_message"="Seuls les admins et les formateurs ont acces à ce ressource",
-*                   "route_name" = "apprenant_add",
-*                   "denormalization_context"={"groups":"apprenant:write"}
-*                  },
-*           "get_formateurs"={
-*                  "method"="GET",
-*                   "route_name"="formateur_liste",
-*                   },
+ * normalizationContext={"groups":{"user:read"}},
+ *     collectionOperations={
+ *          "liste_users"={
+ *              "method"="get",
+ *              "path"="/admin/users",
+ *              "security" = "is_granted('ROLE_ADMIN')",
+ *              "security_message" = "Accès refusé"
+ * },
  *          "api_reset_pwd"={
  *              "route_name"="api_reset_pwd",
  *              "method"="POST",
  *              "denormalization_context"={"groups":"reset:write"},
+ *              "security" = "is_granted('ROLE_ADMIN')",
+ *              "security_message" = "Accès refusé"
  *          },
 *             },
 *           itemOperations={
 *           "get_one_user"={
 *               "method"="GET",
 *               "path"="/admin/users/{id}" ,
+ *               "security" = "is_granted('ROLE_ADMIN')",
+ *              "security_message" = "Accès refusé"
 *               }, 
 *           "put_one_user"={
 *               "method"="PUT",
 *               "path"="/admin/users/{id}" ,
+*               "security" = "is_granted('ROLE_ADMIN')",
+ *              "security_message" = "Accès refusé"
 *               },
 *           "archive_user"={
-    *             "method"="DELETE",
-    *               "route_name"="archive_user"
-*},
-*            "getOne_apprenant"={
- *                  "method"="GET",
- *                  "path"="apprenants/{id}",
- *                   "security" = "is_granted('ROLE_ADMIN') or is_granted('ROLE_CM) or object == user",
-*                   "security_message" = "Seul un admin ou un CM ou le detenteur peut modifier ses informations"
-*                   },
-*            "getOne_formateur"={
-*                  "method"="GET",
-*                  "path"="formateurs/{id}",
-*                   "security" = "is_granted('ROLE_ADMIN') or is_granted('ROLE_CM') or object == user",
-*                   "security_message" = "Seul un admin ou un CM ou le detenteur peut modifier ses informations"
-*                   },
-*              "delete_apprenant"={
-*                   "method" = "DELETE",
-*                   "route_name" = "apprenant_delete",
-*                   },
-*             "update_apprenant" = {
-*                   "method" = "PUT",
-*                   "path" = "/apprenants/{id}",
-*                   "security" = "is_granted('ROLE_ADMIN') or object == user",
-*                   "security_message" = "Seul un admin ou le detenteur a access à ces informations"
-*                   },
-*             "update_formateur" = {
-*                   "method" = "PUT",
-*                   "path" = "/formateurs/{id}",
-*                   "security" = "is_granted('ROLE_ADMIN') or object == user",
-*                   "security_message" = "Seul un admin ou le detenteur peut modifier ses informations"
-*                   }
-*               }, 
- * )
+*             "method"="DELETE",
+*              "path"= "/admin/users/{id}",
+*               "security" = "is_granted('ROLE_ADMIN')",
+ *              "security_message" = "Accès refusé"
+*  },
+
+* }, 
+ *)
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\DiscriminatorMap({"apprenant"="Apprenant", "formateur"="Formateur", "admin"="Admin", "cm"="CM", "user"="User"})
  */
 class User implements UserInterface
 {
@@ -101,7 +65,7 @@ class User implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
@@ -110,7 +74,7 @@ class User implements UserInterface
      * pattern="/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/",
      * message="Email Invalide"
      * )
-     * @Groups({"reset:write","user:write","apprenant:write"})
+     * @Groups({"reset:write","user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read"})
      */
     private $email;
 
@@ -130,7 +94,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le prenom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups({"user:write","apprenant:write"})
+     * @Groups({"user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read"})
      */
     private $prenom;
 
@@ -138,14 +102,14 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le nom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups({"user:write","apprenant:write"})
+     * @Groups({"user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read"})
      */
     private $nom;
 
     /**
      * @ORM\ManyToOne(targetEntity=Profil::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"user:write"})
+     * @Groups({"user:write", "user:read"})
      */
     private $profil;
 
@@ -155,16 +119,14 @@ class User implements UserInterface
      */
     private $avatar;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=ProfilDeSortie::class, inversedBy="users")
-     * @Groups({"apprenant:write", "user:write"})
-     */
-    private $profilDeSortie;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $etat;
+
+   
+    private $type;
 
     public function getId(): ?int
     {
@@ -292,17 +254,6 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getProfilDeSortie(): ?ProfilDeSortie
-    {
-        return $this->profilDeSortie;
-    }
-
-    public function setProfilDeSortie(?ProfilDeSortie $profilDeSortie): self
-    {
-        $this->profilDeSortie = $profilDeSortie;
-
-        return $this;
-    }
 
     public function getEtat(): ?string
     {
@@ -315,5 +266,11 @@ class User implements UserInterface
 
         return $this;
     }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
 
 }

@@ -5,6 +5,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class ArchiveService
 {
@@ -18,7 +19,7 @@ class ArchiveService
     public function archive($object){
         $object->setEtat('archive');
         $this->manager->flush();
-        return new JsonResponse('archivé',Response::HTTP_OK,[],true);
+        return new Response("Ressource archivée avec succes");
     }
 
     //function permettant de liste que les contenus non archivés
@@ -26,7 +27,9 @@ class ArchiveService
         $elementNoArchives=$repo->findBy([
             "etat" => null
         ]);
-        $elementNoArchives = $this->serializer->serialize($elementNoArchives,'json');
+        
+        $elementNoArchives = $this->serializer->serialize($elementNoArchives,'json',[AbstractNormalizer::IGNORED_ATTRIBUTES => ['avatar']]);
+        // dd($elementNoArchives);
         return new JsonResponse($elementNoArchives,Response::HTTP_OK,[],true);
     }
 }

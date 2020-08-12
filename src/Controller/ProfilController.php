@@ -18,12 +18,13 @@ class ProfilController extends AbstractController
         $this->archiveService = $archiveService;
     }
     /**
+* @Security("is_granted('ROLE_ADMIN')", message="Acces non autorisé")
 * @Route(
 * name="archive_profil",
-* path="api/profils/{id<[0-9]+>}",
+* path="api/admin/profils/{id<[0-9]+>}",
 * methods={"DELETE"},
 * defaults={
-* "_controller"="\app\ControllerApprenantController::archive",
+* "_controller"="\app\Controller\ProfilController::archive",
 * "_api_resource_class"=Profil::class,
 * "_api_collection_operation_name"="archive_profil"
 * }
@@ -34,12 +35,13 @@ public function archive(Profil $profil){
     }
 
     /**
+* @Security("is_granted('ROLE_ADMIN')", message="Acces non autorisé")
 * @Route(
 * name="show_profil",
-* path="api/profils",
+* path="api/admin/profils",
 * methods={"GET"},
 * defaults={
-* "_controller"="\app\ControllerApprenantController::showProfils",
+* "_controller"="\app\Controller\ProfilController::showProfils",
 * "_api_resource_class"=Profil::class,
 * "_api_collection_operation_name"="show_profils"
 * }

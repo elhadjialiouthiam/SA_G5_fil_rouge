@@ -20,21 +20,29 @@ use Symfony\Component\Validator\Constraints as Assert;
  *              "security_message" = "Seuls les admins ont le droit d'acces à ce ressource",
  *       },
  *     collectionOperations = {
- *      "post",
- *      "get",
+ *      "add_profil"={
+ *          "method"="post",
+ *          "path"="/admin/profils"
+ * },
  *          "show_profils"={
 *                   "method" = "GET",
-*                   "path"="/profils" ,
 *                   "route_name" = "show_profil",
 *                  },
  * },
  *     itemOperations = {
- *              "get",
- *               "archive_profil"={
-*                   "method" = "DELETE",
-*                   "route_name" = "archive_profil",
-*                  }
- *           },
+ *           "show_one_profil"={
+ *                  "method"="get",
+ *                  "path"="/admin/profils/{id}"
+ * },
+ *         "update_profil"={
+ *              "method"="put",
+ *              "path"="/admin/profils/{id}"
+ * },
+ *         "archive_profil"={
+*                "method" = "DELETE",
+*                 "route_name" = "archive_profil",
+*  }
+ *  },
  *             normalizationContext={"groups"={"profil:read"}},
  *              denormalizationContext={"groups"={"profil:write"}}
  * )

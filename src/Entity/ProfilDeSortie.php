@@ -16,15 +16,24 @@ use Doctrine\Common\Collections\ArrayCollection;
  *       "security_message":"Seuls les admins ont acces à cette ressource" 
  *    },
  *   collectionOperations={
- *      "post",
+ *      "add_ps"={
+ *          "method"="post",
+ *          "path"="/admin/profil_de_sorties"
+ * },
  *      "show_profil_sortie" = {
  *          "method"="GET",
  *          "route_name"="show_profil_sortie"
  *          }
  *      },
  *    itemOperations={
- *          "get",
- *          "put",
+ *          "show_one_ps"={
+ *              "method"="get",
+ *              "path"="/admin/profil_de_sorties/{id}"
+ * },
+ *          "update_ps"={
+ *              "method"="put",
+ *              "path"="/admin/profil_de_sorties/{id}"
+ * },
  *        "archive_profil_sortie" = {
  *          "method"="DELETE",
  *          "route_name" = "archive_profilSortie"
@@ -48,19 +57,19 @@ class ProfilDeSortie
     private $libelle;
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="profilDeSortie")
-     * @ApiSubresource
-     */
-    private $users;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $etat;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Apprenant::class, mappedBy="profilDeSortie")
+     */
+    private $apprenants;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->apprenants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,37 +89,6 @@ class ProfilDeSortie
         return $this;
     }
 
-    /**
-     * @return Collection|User[]
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): self
-    {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->setProfilDeSortie($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): self
-    {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
-            // set the owning side to null (unless already changed)
-            if ($user->getProfilDeSortie() === $this) {
-                $user->setProfilDeSortie(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getEtat(): ?string
     {
         return $this->etat;
@@ -119,6 +97,37 @@ class ProfilDeSortie
     public function setEtat(?string $etat): self
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Apprenant[]
+     */
+    public function getApprenants(): Collection
+    {
+        return $this->apprenants;
+    }
+
+    public function addApprenant(Apprenant $apprenant): self
+    {
+        if (!$this->apprenants->contains($apprenant)) {
+            $this->apprenants[] = $apprenant;
+            $apprenant->setProfilDeSortie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApprenant(Apprenant $apprenant): self
+    {
+        if ($this->apprenants->contains($apprenant)) {
+            $this->apprenants->removeElement($apprenant);
+            // set the owning side to null (unless already changed)
+            if ($apprenant->getProfilDeSortie() === $this) {
+                $apprenant->setProfilDeSortie(null);
+            }
+        }
 
         return $this;
     }

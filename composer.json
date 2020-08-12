@@ -44,6 +44,8 @@
         "symfonycasts/reset-password-bundle": "^1.1",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
+        "webonyx/graphql-php": "^14.1",
+        "willdurand/hateoas": "^3.6",
         "willdurand/hateoas-bundle": "^2.1"
     },
     "require-dev": {
@@ -52,7 +54,7 @@
         "symfony/browser-kit": "^5.1",
         "symfony/css-selector": "^5.1",
         "symfony/debug-bundle": "^5.1",
-        "symfony/maker-bundle": "^1.0",
+        "symfony/maker-bundle": "^1.20",
         "symfony/monolog-bundle": "^3.0",
         "symfony/phpunit-bridge": "^5.1",
         "symfony/stopwatch": "^5.1",

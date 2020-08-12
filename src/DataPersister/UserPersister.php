@@ -1,34 +1,32 @@
 <?php
+
 namespace App\DataPersister;
 
+use App\Entity\CM;
 use App\Entity\User;
+use App\Entity\Apprenant;
 use App\Service\ArchiveService;
+use App\Repository\UserRepository;
+use App\Repository\ProfilRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-
-
 final class UserPersister implements ContextAwareDataPersisterInterface
 {
-    private $encoder;
-    private $archiveService;
-    private $serializer;
+    private $passwordEncoder;
     private $manager;
-    private $validator;
-    // private $request;
-    public function __construct(UserPasswordEncoderInterface $encoder, ArchiveService $archiveService, SerializerInterface $serializer, EntityManagerInterface $manager, ValidatorInterface $validator){
-        $this->encoder = $encoder;
-        $this->archiveService = $archiveService;
-        $this->serializer = $serializer;
+    private $profilRepo;
+    private $archiveService;
+    private $userRepo;
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $manager, ProfilRepository $profilRepo, ArchiveService $archiveService, UserRepository $userRepo){
         $this->manager = $manager;
-        $this->validator = $validator;
-        // $this->request = $request;
+        $this->passwordEncoder = $passwordEncoder;
+        $this->profilRepo = $profilRepo;
+        $this->archiveService = $archiveService;
+        $this->userRepo = $userRepo;
     }
 
 
@@ -39,24 +37,13 @@ final class UserPersister implements ContextAwareDataPersisterInterface
 
     public function persist($data, array $context = [])
     {
-        // $request = new Request();
-        // dd($request->request);
-        // $user = $this->serializer->deserialize($request->getContent(),User::class,'json');
-        // $errors = $this->validator->validate($user);
-        // if(count($errors) > 0){
-        //     $errors = $thsi->serializer->serialize($errors,'json');
-        //     return new JsonResponse($errors,Response::HTTP_BAD_REQUEST,[],true);
-        // }
-        // $user->setRoles($user->getRoles());
-        // $user->setPassword($this->encoder->encodePassword($user,$user->getPassword()));
-        // $this->manager->persist($user);
-        // $this->manager->flush();
-        // return new JsonResponse("Créé avec success",Response::HTTP_CREATED,[],true);
+            $this->manager->persist($data);
+            $this->manager->flush();
+        return new JsonResponse("Opération réussie",Response::HTTP_CREATED,[],true);
     }
 
     public function remove($data, array $context = [])
     {
         return $this->archiveService->archive($data);
-      // call your persistence layer to delete $data
     }
 }

@@ -6,8 +6,12 @@ use App\Entity\ProfilDeSortie;
 use App\Service\ArchiveService;
 use App\Repository\ProfilDeSortieRepository;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+/**
+ * @IsGranted("ROLE_USER")
+*/
 class ProfilDeSortieController extends AbstractController
 {
 
@@ -17,7 +21,7 @@ class ProfilDeSortieController extends AbstractController
     }
     /**
      * @Route(
-     * path="api/profil_de_sorties/{id<[0-9]+>}", 
+     * path="api/admin/profil_de_sorties/{id<[0-9]+>}", 
      * name="archive_profilSortie",
      * methods={"DELETE"},
      * defaults = {
@@ -34,7 +38,7 @@ class ProfilDeSortieController extends AbstractController
 
         /**
      * @Route(
-     * path="api/profil_de_sorties", 
+     * path="api/admin/profil_de_sorties", 
      * name="show_profil_sortie",
      * methods={"GET"},
      * defaults = {
