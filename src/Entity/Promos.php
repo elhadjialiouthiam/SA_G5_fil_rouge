@@ -220,6 +220,11 @@ class Promos
      */
     private $apprenants;
 
+    /**
+     * @ORM\Column(type="blob", nullable=true)
+     */
+    private $avatar;
+
     public function __construct()
     {
         $this->formateur = new ArrayCollection();
@@ -448,6 +453,18 @@ class Promos
                 $apprenant->setPromos(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar($avatar): self
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }

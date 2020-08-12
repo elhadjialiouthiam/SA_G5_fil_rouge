@@ -458,6 +458,9 @@ class PromosController extends AbstractController
                 $promoObj->addApprenant($std);
             }
         }
+        // gestion avatar
+        
+        
         $this->manager->persist($promoObj);
         $this->manager->flush();
         return $this->json($promoObj,Response::HTTP_CREATED);
@@ -556,11 +559,13 @@ class PromosController extends AbstractController
             return $this->json(["message" => "Cette promotion n'existe pas."],Response::HTTP_NOT_FOUND);
         $apprenantJson = $request->getContent();
         $apprenantTab = $this->serializer->decode($apprenantJson,"json");
-        $apprenants = isset($formateurTab["id"]) ? $apprenantTab["id"] : [];
+        $apprenants = isset($apprenantTab["id"]) ? $apprenantTab["id"] : [];
+        // dd($apprenants);
         $apprenantObj = $this->serializer->denormalize($apprenantTab,"App\Entity\Promos");
         $apprenant = $ApprenantRepo->findOneBy([
             "id"=> $apprenants
         ]);
+        // dd($apprenant);
         $IsIn = false;
         if ($apprenant) {
             $promo->addApprenant($apprenant);
