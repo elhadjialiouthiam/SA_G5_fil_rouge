@@ -2,19 +2,19 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Promos;
+use App\Entity\Tag;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class PromosVoter extends Voter
+class TagVoter extends Voter
 {
     protected function supports($attribute, $subject)
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, ['EDIT', 'VIEW','DELETE','SET'])
-            && $subject instanceof \App\Entity\Promos;
+            && $subject instanceof \App\Entity\Tag;
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

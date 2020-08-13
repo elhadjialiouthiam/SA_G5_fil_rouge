@@ -459,7 +459,7 @@ class PromosController extends AbstractController
             }
         }
         // gestion avatar
-        
+
         
         $this->manager->persist($promoObj);
         $this->manager->flush();
@@ -627,7 +627,7 @@ class PromosController extends AbstractController
                 if ($groupe->getStatut() == "actif") {
                     $groupe->setStatut() == "archive";
                     $this->manager->flush();
-                    return $this->json(["message" => "Suppression avec succes."],Response::HTTP_OK);
+                    return $this->json(["message" => "Modif avec succes."],Response::HTTP_OK);
                 }
             }
 
