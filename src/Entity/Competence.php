@@ -3,15 +3,49 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\CompetenceController;
 use App\Repository\CompetenceRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=CompetenceRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ * denormalizationContext={"groups":{"competence:write"}},
+ * normalizationContext={"groups":{"competence:read"}},
+ *      collectionOperations={
+ *          "show_comptences"={
+ *              "method" = "get",
+ *              "path"="/admin/competences",
+ *              "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM'))"
+ * },
+ *        "post"={
+ *          "path"="/admin/competences",
+ *          "access_control"="(is_granted('ROLE_ADMIN'))"
+ *      }
+ * },
+ * itemOperations={
+ *      "show_one_competence"={
+ *          "method"="get",
+ *          "path"="/admin/competences/{id}",
+ *           "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM'))"
+ * },
+ *       "update_competence"={
+ *          "method"="put",
+ *          "path"="/admin/competences/{id}",
+ *          "access_control"="(is_granted('ROLE_ADMIN'))"
+ *          
+ * },
+ *      "archive_competence"={
+ *          "method"="delete",
+ *          "route_name"="archive_competence",
+ *          "access_control"="(is_granted('ROLE_ADMIN'))"
+ * }
+ * }
+ * )
  */
 class Competence
 {
@@ -19,27 +53,30 @@ class Competence
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("write:addNc")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"competence:write", "competence:read", "gc:read"})
      */
     private $libelle;
 
     /**
-     * @ORM\ManyToMany(targetEntity=GroupCompetences::class, mappedBy="competences")
+     * @ORM\ManyToMany(targetEntity=GroupCompetences::class, mappedBy="competences", cascade={"persist"})
      */
     private $groupCompetences;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"competence:write", "competence:read", "gc:read", "competence_only"})
      */
     private $descriptif;
 
      /**
      * @ORM\OneToMany(targetEntity=Niveau::class, mappedBy="competence")
-     * @ApiSubresource
+     * @Groups({"competence:write", "competence:read", "gc:read","competence_only"})
      */
     private $niveaux;
 
@@ -67,6 +104,11 @@ class Competence
     }
 
     
+    public function __construct()
+    {
+   
+        $this->niveaux = new ArrayCollection();
+    }
 
 
 
@@ -77,6 +119,29 @@ class Competence
     public function getNiveaux(): Collection
     {
         return $this->niveaux;
+    }
+
+    public function addNiveau(Niveau $niveau): self
+    {
+        if (!$this->niveaux->contains($niveau)) {
+            $this->niveaux[] = $niveau;
+            $niveau->setCompetence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNiveau(Niveau $niveau): self
+    {
+        if ($this->niveaux->contains($niveau)) {
+            $this->niveaux->removeElement($niveau);
+            // set the owning side to null (unless already changed)
+            if ($niveau->getCompetence() === $this) {
+                $niveau->setCompetence(null);
+            }
+        }
+
+        return $this;
     }
 
     public function getDescriptif(): ?string

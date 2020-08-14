@@ -31,4 +31,41 @@ class Admin extends User
     {
         return $this->id;
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity=Promos::class, mappedBy="admin")
+     */
+    private $promos;
+
+    /**
+     * @return Collection|Promos[]
+     */
+    public function getPromos(): Collection
+    {
+        return $this->promos;
+    }
+
+
+    public function addPromo(Promos $promo): self
+    {
+        if (!$this->promos->contains($promo)) {
+            $this->promos[] = $promo;
+            $promo->setAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromo(Promos $promo): self
+    {
+        if ($this->promos->contains($promo)) {
+            $this->promos->removeElement($promo);
+            // set the owning side to null (unless already changed)
+            if ($promo->getAdmin() === $this) {
+                $promo->setAdmin(null);
+            }
+        }
+
+        return $this;
+    }
 }

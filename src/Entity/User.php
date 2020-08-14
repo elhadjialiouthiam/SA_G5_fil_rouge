@@ -74,8 +74,8 @@ class User implements UserInterface
      * pattern="/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/",
      * message="Email Invalide"
      * )
-     * @Groups({"reset:write","user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read"})
-     */
+     * @Groups({"reset:write","user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read", "promos:write"})
+     */ 
     private $email;
 
     /**

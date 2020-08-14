@@ -113,6 +113,11 @@ class Groupe
      */
     private $etat;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="groupes")
+     */
+    private $promos;
+
     public function __construct()
     {
         $this->Apprenants = new ArrayCollection();
@@ -235,4 +240,17 @@ class Groupe
 
         return $this;
     }
+
+    public function getPromos(): ?Promos
+    {
+        return $this->promos;
+    }
+
+    public function setPromos(?Promos $promos): self
+    {
+        $this->promos = $promos;
+
+        return $this;
+    }
+
 }
