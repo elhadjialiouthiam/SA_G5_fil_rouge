@@ -63,54 +63,32 @@ class GroupCompetencesController extends AbstractController
      * path="api/admin/grpecompetences/{id}/competences",
      * methods={"PUT"},
      * defaults={
-     * "_controller"="app\Controller\GroupCompetencesController::addNewCompetence",
+     * "_controller"="app\Controller\GroupCompetencesController::addOrDeleteNewCompetenceFromGC",
      * "_api_resource_class"=GroupCompetences::class,
      * "api_collection_operation_name"="ajout_gc_competence"
      * }
      * )
      */
-  public function addNewCompetence($id, Request $request, GroupCompetencesRepository $gcRepository, SerializerInterface $serializer, CompetenceRepository $comRepo, EntityManagerInterface $manager){
+  public function addOrDeleteNewCompetenceFromGC($id, Request $request, GroupCompetencesRepository $gcRepository, SerializerInterface $serializer, CompetenceRepository $comRepo, EntityManagerInterface $manager){
     $groupComp = $gcRepository->findOneBy([
         "id"=>$id
     ]);
     $requete = $request->getContent();
+    $competences = $groupComp->getCompetences();
+    // dd($competences);
     $competenceArray = $serializer->decode($requete, "json");
   
     $theNewCompetence = $comRepo->findOneBy([
         "id" => $competenceArray["id"],
     ]);
+    if($competences->contains($theNewCompetence)){
+        $groupComp->removeCompetence($theNewCompetence);
+        $manager->flush();
+        return new Response("La compétence a été supprimée du groupe de compétences");
+        
+    }
     $groupComp->addCompetence($theNewCompetence);
     $manager->flush();
     return new Response("Compétence ajoutée avec succès"); 
   }
-
-  //supprimer une competence d'un groupe de competences
-          /**
-     * @Route(
-     * name="remove_gc_competence",
-     * path="api/admin/grpecompetences/{id}/competences/{iden}",
-     * methods={"DELETE"},
-     * defaults={
-     * "_controller"="app\Controller\GroupCompetencesController::removeCompetenceFromGc",
-     * "_api_resource_class"=GroupCompetences::class,
-     * "api_collection_operation_name"="remove_gc_competence"
-     * }
-     * )
-     */
-
-     public function removeCompetenceFromGc($id, $iden, Request $request, GroupCompetencesRepository $gcRepository, SerializerInterface $serializer, CompetenceRepository $comRepo, EntityManagerInterface $manager){
-        $groupComp = $gcRepository->findOneBy([
-            "id"=>$id
-        ]);
-        // $requete = $request->getContent();
-        // $competenceArray = $serializer->decode($requete, "json");
-      
-        $theNewCompetence = $comRepo->findOneBy([
-            "id" => $iden,
-        ]);
-        $groupComp->removeCompetence($theNewCompetence);
-        $manager->flush();
-        return new Response("Compétence retirée du groupe de competences"); 
-     }
-
 }
