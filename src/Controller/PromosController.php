@@ -4,13 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Groupe;
 use App\Entity\Promos;
+use App\Entity\Apprenant;
 use App\Repository\GroupeRepository;
+use App\Repository\ProfilRepository;
 use App\Repository\PromosRepository;
 use App\Repository\ApprenantRepository;
 use App\Repository\FormateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReferentielRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -345,7 +348,7 @@ class PromosController extends AbstractController
      *     name="addPromo"
      * )
      */
-    public function addPromo(Request $request,\Swift_Mailer $mailer,TokenStorageInterface $tokenStorage,ReferentielRepository $referentielRepository,ApprenantRepository $apprenantRepository,FormateurRepository $formateurRepository)
+    public function addPromo(Request $request,TokenStorageInterface $tokenStorage,ReferentielRepository $referentielRepository,ApprenantRepository $apprenantRepository,FormateurRepository $formateurRepository, ProfilRepository $profilRepository, ResetPasswordController $reset,MailerInterface $mailer)
     {
         $promo = new Promos();
         if (!$this->isGranted("EDIT",$promo))
@@ -404,17 +407,22 @@ class PromosController extends AbstractController
             foreach ($emails as $email)
             {
                 $student = $apprenantRepository->findOneBy(["email" => $email["email"]]);
+                $mailTo = $email["email"];
+                $reset->processSendingPasswordResetEmail(
+                    $mailTo,
+                    $mailer
+                );
                 if(!$student)
                 {
                     return $this->json(["message" => "L'apprenant ayant l'email: $email[email] n'existe pas."],Response::HTTP_NOT_FOUND);
                 }
                 // $student->setIsConnected(false);
                 $unit->addApprenant($student);
-                $message = (new \Swift_Message("Ajout apprenant au promo"))
-                            ->setFrom($sender)
-                            ->setTo($email["email"])
-                            ->setBody("Vous avez été ajouté au promo");
-                $mailerStatus = $mailer->send($message);
+                // $message = (new \Swift_Message("Ajout apprenant au promo"))
+                //             ->setFrom($sender)
+                //             ->setTo($email["email"])
+                //             ->setBody("Vous avez été ajouté au promo");
+                // $mailerStatus = $mailer->send($message);
                 
                 // dd($mailerStatus);
             }
@@ -444,18 +452,34 @@ class PromosController extends AbstractController
         }
         // gestion des apprenants
         if(count($students)){
-            foreach ($students as $student) {
-                $stdId = isset($student["id"]) ? $student["id"] : null;
-                $std = $apprenantRepository->findOneBy(["id"=>$stdId]);
+            foreach ($students as $apprenant) {
+                $std = $apprenantRepository->findOneBy([
+                    "email" => $apprenant["email"]
+                ]);
+                $email = $apprenant["email"];
+                $reset->processSendingPasswordResetEmail(
+                    $email,
+                    $mailer
+                );
                 if (!$std) {
-                    return $this->json(["message" => "Cet apprenant n'existe pas."],Response::HTTP_NOT_FOUND);
+                    $Newapprenant = new Apprenant;
+                    $Newapprenant->setEMail($apprenant["email"]);
+                    $Newapprenant->setPassword("password");
+                    $Newapprenant->setPrenom("firstname");
+                    $Newapprenant->setNom("lastname");
+                    $profil = $profilRepository->findOneBy([
+                        "libelle" => "apprenant"
+                    ]);
+                    $Newapprenant->setProfil($profil);
+                    $this->manager->persist($Newapprenant);
+                    $this->manager->flush();
                 }
-                $email = $std->getEmail();
-                $message = (new \Swift_Message("Ajout apprenant au promo"))
-                            ->setFrom($sender)
-                            ->setTo($std->getEmail())
-                            ->setBody("Vous avez été ajouté au promo");
-                $mailerStatus = $mailer->send($message);
+                // $email = $std->getEmail();
+                // $message = (new \Swift_Message("Ajout apprenant au promo"))
+                //             ->setFrom($sender)
+                //             ->setTo($std->getEmail())
+                //             ->setBody("Vous avez été ajouté au promo");
+                // $mailerStatus = $mailer->send($message);
                 $promoObj->addApprenant($std);
             }
         }

@@ -73,7 +73,7 @@ class Groupe
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255)
      * @Groups({"groupe:write", "groupe:read"})
      */
     private $nom;
@@ -114,7 +114,7 @@ class Groupe
     private $etat;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="groupes")
+     * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="groupes",cascade={"persist"}))
      */
     private $promos;
 

@@ -61,7 +61,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * },
  *          "remove_gc_competence"={
  *              "method"="DELETE",
- *              "route_name"="remove_gc_competence",
+ *              "route_name"="ajout_gc_competence",
  *              "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM'))"
  * }
  * 
