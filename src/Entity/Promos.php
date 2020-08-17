@@ -196,7 +196,7 @@ class Promos
     private $formateur;
 
     /**
-     * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="promos")
+     * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="promos",cascade={"persist"}))
      * @Groups({"promos:read", "promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
      */
     private $groupes;

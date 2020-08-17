@@ -1,5 +1,5 @@
 api_platform:
-    title: "Saly's Api space"
+    title: "(EL HADJI ALIOU THIAM)'S Api space"
     description: 'A Symfony API to manage a simple blog app.'
     version: '1.0.0'
     mapping:

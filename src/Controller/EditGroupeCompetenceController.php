@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Competence;
 use App\Repository\CompetenceRepository;
+use App\Repository\GroupCompetencesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,7 +22,7 @@ class EditGroupeCompetenceController extends AbstractController
      *     methods={"PUT"}
      * )
      */
-    public function editGroupeCompetence(int $id, CompetenceRepository $repoComp, GroupeDeCompetenceRepository $repoGroupeComp, EntityManagerInterface $em, Request $request)
+    public function editGroupeCompetence(int $id, CompetenceRepository $repoComp, GroupCompetencesRepository $repoGroupeComp, EntityManagerInterface $em, Request $request)
     {
         $data=json_decode($request->getContent(),true);
         
@@ -87,7 +88,7 @@ class EditGroupeCompetenceController extends AbstractController
      *     methods={"GET"}
      * )
     */
-    public function afficheCompetence( GroupeDeCompetenceRepository $groupeDeCompetenceRepository ){
+    public function afficheCompetence( GroupCompetencesRepository $groupeDeCompetenceRepository ){
         $groupeDeCompetence =$groupeDeCompetenceRepository->findBy([
             "actif"=>"true"
         ]);
