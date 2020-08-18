@@ -4,13 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Groupe;
 use App\Entity\Promos;
+use App\Entity\Apprenant;
 use App\Repository\GroupeRepository;
+use App\Repository\ProfilRepository;
 use App\Repository\PromosRepository;
 use App\Repository\ApprenantRepository;
 use App\Repository\FormateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReferentielRepository;
+use App\Controller\ResetPasswordController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PromosController extends AbstractController
 {
@@ -345,14 +350,14 @@ class PromosController extends AbstractController
      *     name="addPromo"
      * )
      */
-    public function addPromo(Request $request,\Swift_Mailer $mailer,TokenStorageInterface $tokenStorage,ReferentielRepository $referentielRepository,ApprenantRepository $apprenantRepository,FormateurRepository $formateurRepository)
+    public function addPromo(Request $request,TokenStorageInterface $tokenStorage,ReferentielRepository $referentielRepository,ApprenantRepository $apprenantRepository,FormateurRepository $formateurRepository, ProfilRepository $profilRepository, ResetPasswordController $reset,MailerInterface $mailer)
     {
         $promo = new Promos();
         if (!$this->isGranted("EDIT",$promo))
             return $this->json(["message" => "Vous n'avez pas access à cette Ressource"],Response::HTTP_FORBIDDEN);
         $promoJson = $request->getContent();
         // dd($promoJson);
-        $sender = 'abdoudiallo405@gmail.com';
+        // $sender = 'abdoudiallo405@gmail.com';
         $promoTab = $this->serializer->decode($promoJson,"json");
         $referentielId = $promoTab['referentiel'][0]["id"];
 
@@ -403,20 +408,39 @@ class PromosController extends AbstractController
                 //  ->setIsDeleted(false);
             foreach ($emails as $email)
             {
+                $mailTo = $email["email"];
+                // dd($mailTo);
                 $student = $apprenantRepository->findOneBy(["email" => $email["email"]]);
-                if(!$student)
+                if($student == null)
                 {
-                    return $this->json(["message" => "L'apprenant ayant l'email: $email[email] n'existe pas."],Response::HTTP_NOT_FOUND);
+                    $Newapprenant = new Apprenant;
+                    $Newapprenant->setEMail($mailTo)
+                                ->setPassword("password")
+                                ->setPrenom("firstname")
+                                ->setNom("lastname");
+                    $profil = $profilRepository->findOneBy([
+                        "libelle" => "apprenant"
+                    ]);
+                    $Newapprenant->setProfil($profil)
+                                ->setRoles($Newapprenant->getRoles());
+                    $this->manager->persist($Newapprenant);
+                    $unit->addApprenant($Newapprenant);
+                    $promoObj->addApprenant($Newapprenant);
+                    $this->manager->flush();
+                    // $promoObj->addApprenant($Newapprenant);  
                 }
                 // $student->setIsConnected(false);
+                else{
                 $unit->addApprenant($student);
-                $message = (new \Swift_Message("Ajout apprenant au promo"))
-                            ->setFrom($sender)
-                            ->setTo($email["email"])
-                            ->setBody("Vous avez été ajouté au promo");
-                $mailerStatus = $mailer->send($message);
+                // $this->manager->flush();
+                }
+                $this->manager->flush();
+                $reset->processSendingPasswordResetEmail(
+                    $mailTo,
+                    $mailer
+                );
                 
-                // dd($mailerStatus);
+                
             }
             $unitErrors = $this->validator->validate($unit);
             if(count($unitErrors))
@@ -444,19 +468,38 @@ class PromosController extends AbstractController
         }
         // gestion des apprenants
         if(count($students)){
-            foreach ($students as $student) {
-                $stdId = isset($student["id"]) ? $student["id"] : null;
-                $std = $apprenantRepository->findOneBy(["id"=>$stdId]);
-                if (!$std) {
-                    return $this->json(["message" => "Cet apprenant n'existe pas."],Response::HTTP_NOT_FOUND);
+            // dd($students);
+            foreach ($students as $apprenant) {
+                $email = $apprenant["email"];
+                // dd($email);
+                
+                $std = $apprenantRepository->findOneBy([
+                    "email" => $apprenant["email"]
+                ]);
+               
+              
+                if ($std == null) {
+                    $Newapprenant = new Apprenant;
+                    $Newapprenant->setEMail($apprenant["email"])
+                                ->setPassword("password")
+                                ->setPrenom("firstname")
+                                ->setNom("lastname");   
+                    $profil = $profilRepository->findOneBy([
+                        "libelle" => "apprenant"
+                    ]);
+                    $Newapprenant->setProfil($profil)
+                                ->setRoles($Newapprenant->getRoles());
+                    $this->manager->persist($Newapprenant);
+                    $promoObj->addApprenant($Newapprenant);
                 }
-                $email = $std->getEmail();
-                $message = (new \Swift_Message("Ajout apprenant au promo"))
-                            ->setFrom($sender)
-                            ->setTo($std->getEmail())
-                            ->setBody("Vous avez été ajouté au promo");
-                $mailerStatus = $mailer->send($message);
+                else{
                 $promoObj->addApprenant($std);
+                }
+                $this->manager->flush();
+                $reset->processSendingPasswordResetEmail(
+                    $email,
+                    $mailer
+                );
             }
         }
         // gestion avatar
@@ -636,13 +679,82 @@ class PromosController extends AbstractController
     }
 
     
-    
     private function autorisation()
-    {
-        $promo = new Promos();
-        if (!$this->isGranted("VIEW",$promo))
-            return $this->json(["message" => "Vous n'avez pas access à cette Ressource"],Response::HTTP_FORBIDDEN);
-    }
+{
+    $promo = new Promos();
+    if (!$this->isGranted("VIEW",$promo))
+        return $this->json(["message" => "Vous n'avez pas access à cette Ressource"],Response::HTTP_FORBIDDEN);
+}
+ 
 
 
+
+    //import de fichier excel
+
+    /**
+   * @Route(
+   * name="xlsx",
+   * path="api/admin/promos/upload-excel", 
+     *  methods={"POST"},
+     * defaults={
+     * "_controller"="\app\Controller\PromosController::uploadExcel",
+     *  "_api_collection_operation_name"="xlsx"
+     *     }
+   * )
+    */
+    public function uploadExcel(Request $request, ApprenantRepository $apprenantRepository, ProfilRepository $profilRepository, PromosRepository $promoRepo, MailerInterface $mailer, ResetPasswordController $reset){
+    //on recupere le fichier uploadé
+   $file = $request->files->get('file'); 
+   //l'emplacement ou on va enregistrer les fichier
+   $fileFolder = __DIR__ . '/../../public/uploads/';  
+  
+   //  md5 function pour generer un unique id pour le fichier  and et le concatener avec le nom original  
+   $filePathName = md5(uniqid()) . $file->getClientOriginalName();
+      
+            try {
+                $file->move($fileFolder, $filePathName);
+            } catch (FileException $e) {
+                dd($e);
+            }
+    //on lit le contenu du fichier excel
+    $spreadsheet = IOFactory::load($fileFolder . $filePathName); 
+    //on recupere le contenu du fichier sous forme de tableau
+    $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true); 
+   //on recupere la derniere promo
+   $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
+    foreach ($sheetData as $Row) 
+        { 
+            $first_name = $Row['A']; 
+            $last_name = $Row['B']; 
+            $email= $Row['C'];  
+
+            $user_existant = $apprenantRepository->findOneBy([
+                "email" => $email
+            ]); 
+                // on verifie si l'utlisateur n'existe pas deja dans la BD
+            if (!$user_existant) 
+             {   
+                $student = new Apprenant(); 
+                $student->setPrenom($first_name);           
+                $student->setNom($last_name);
+                $student->setEmail($email);
+                $student->setPassword("password");
+                $profil = $profilRepository->findOneBy([
+                    "libelle" => "apprenant"
+                ]);
+                $student->setProfil($profil)
+                            ->setRoles($student->getRoles());
+                $this->manager->persist($student); 
+                $lastPromo->addApprenant($student);
+                $this->manager->flush(); 
+                //envoi des mails
+                $reset->processSendingPasswordResetEmail(
+                    $email,
+                    $mailer
+                );
+             } 
+        } 
+    return $this->json("Succes", 200); 
+
+}
 }
