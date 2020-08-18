@@ -8,8 +8,10 @@ use App\Service\ArchiveService;
 use App\Repository\GroupeRepository;
 use App\Repository\ApprenantRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class GroupeController extends AbstractController
@@ -19,11 +21,13 @@ class GroupeController extends AbstractController
     private $grpeRepo;
     private $apprenantRepo;
     private $manager;
-    public function __construct(ArchiveService $archiveService, GroupeRepository $grpeRepo, ApprenantRepository $apprenantRepo, EntityManagerInterface $manager){
+    private $serializer;
+    public function __construct(ArchiveService $archiveService, GroupeRepository $grpeRepo, ApprenantRepository $apprenantRepo, EntityManagerInterface $manager, SerializerInterface $serializer){
         $this->archiveService = $archiveService;
         $this->grpeRepo = $grpeRepo;
         $this->apprenantRepo = $apprenantRepo;
         $this->manager = $manager;
+        $this->serializer = $serializer;
     }
     //supprimer un apprenanat du groupe
     /**
@@ -115,7 +119,7 @@ class GroupeController extends AbstractController
 
           /**
      * @Route(
-     * path="api/admin/groupes/{id}/apprenants/{iden}",
+     * path="api/admin/groupes/{id}/apprenants",
      * name="add_apprenant_group",
      * requirements={"id":"\d+"},
      * requirements={"iden":"\d+"},
@@ -127,19 +131,21 @@ class GroupeController extends AbstractController
      * }
      * )
      */
-    public function addApprenantToGroup($id,$iden){
+    public function addApprenantToGroup($id,Request $request){
         $groupe = $this->grpeRepo->findOneBy([
             "id"=>$id
         ]);
+        $request = $request->getContent();
+        //on traduit la requette sous forme de tableau
+        $requestArray = $this->serializer->decode($request, "json");
         $apprenants = $groupe->getApprenants();
         $etudiantWithId = $this->apprenantRepo->findOneBy([
-            "id"=>$iden
+            "id"=>$requestArray["id"]
         ]);
         if($apprenants->contains($etudiantWithId)){
             return new Response("Cet apprenant existe déjà dans le groupe");
         }
-        $data = $groupe->addApprenant($etudiantWithId);
-        $this->manager->persist($data);
+        $groupe->addApprenant($etudiantWithId);
         $this->manager->flush();
         return new Response("L'apprenant a été ajouté avec success");
     }

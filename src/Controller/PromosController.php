@@ -590,7 +590,11 @@ class PromosController extends AbstractController
         $promo = new Promos();
         $promo = $this->promosRepository->findOneBy([
             "id"=>$id
-        ]);
+        ]);$Newapprenant = new Apprenant;
+        $Newapprenant->setEMail($mailTo);
+        $Newapprenant->setPassword("password");
+        $Newapprenant->setPrenom("firstname");
+        $Newapprenant->setNom("lastname");
         // dd($promo);
         if(!$promo)
             return $this->json(["message" => "Cette promotion n'existe pas."],Response::HTTP_NOT_FOUND);
@@ -654,7 +658,11 @@ class PromosController extends AbstractController
 
      public function editState($id,$id_groupe, GroupeRepository $groupeRepo)
      {
-        $promo = $this->promosRepository->find($id);
+        $promo = $this->promosRepository->find($id);$Newapprenant = new Apprenant;
+        $Newapprenant->setEMail($mailTo);
+        $Newapprenant->setPassword("password");
+        $Newapprenant->setPrenom("firstname");
+        $Newapprenant->setNom("lastname");
         $groupe = $groupeRepo->findOneBy([
             "id"=> $id_groupe
         ]);
