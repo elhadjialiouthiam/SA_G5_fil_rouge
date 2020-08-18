@@ -91,4 +91,6 @@ class GroupCompetencesController extends AbstractController
     $manager->flush();
     return new Response("Compétence ajoutée avec succès"); 
   }
+
+  
 }

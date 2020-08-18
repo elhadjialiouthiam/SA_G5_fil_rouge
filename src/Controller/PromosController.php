@@ -411,7 +411,16 @@ class PromosController extends AbstractController
                 $mailTo = $email["email"];
                 // dd($mailTo);
                 $student = $apprenantRepository->findOneBy(["email" => $email["email"]]);
+<<<<<<< HEAD
                 if($student == null)
+=======
+                $mailTo = $email["email"];
+                $reset->processSendingPasswordResetEmail(
+                    $mailTo,
+                    $mailer
+                );
+                if(!$student)
+>>>>>>> 606c78a9475d6103fc906a7c6124e3e03368fb99
                 {
                     $Newapprenant = new Apprenant;
                     $Newapprenant->setEMail($mailTo)
@@ -432,6 +441,7 @@ class PromosController extends AbstractController
                 // $student->setIsConnected(false);
                 else{
                 $unit->addApprenant($student);
+<<<<<<< HEAD
                 // $this->manager->flush();
                 }
                 $this->manager->flush();
@@ -440,6 +450,13 @@ class PromosController extends AbstractController
                     $mailer
                 );
                 
+=======
+                // $message = (new \Swift_Message("Ajout apprenant au promo"))
+                //             ->setFrom($sender)
+                //             ->setTo($email["email"])
+                //             ->setBody("Vous avez été ajouté au promo");
+                // $mailerStatus = $mailer->send($message);
+>>>>>>> 606c78a9475d6103fc906a7c6124e3e03368fb99
                 
             }
             $unitErrors = $this->validator->validate($unit);
@@ -468,6 +485,7 @@ class PromosController extends AbstractController
         }
         // gestion des apprenants
         if(count($students)){
+<<<<<<< HEAD
             // dd($students);
             foreach ($students as $apprenant) {
                 $email = $apprenant["email"];
@@ -493,6 +511,36 @@ class PromosController extends AbstractController
                     $promoObj->addApprenant($Newapprenant);
                 }
                 else{
+=======
+            foreach ($students as $apprenant) {
+                $std = $apprenantRepository->findOneBy([
+                    "email" => $apprenant["email"]
+                ]);
+                $email = $apprenant["email"];
+                $reset->processSendingPasswordResetEmail(
+                    $email,
+                    $mailer
+                );
+                if (!$std) {
+                    $Newapprenant = new Apprenant;
+                    $Newapprenant->setEMail($apprenant["email"]);
+                    $Newapprenant->setPassword("password");
+                    $Newapprenant->setPrenom("firstname");
+                    $Newapprenant->setNom("lastname");
+                    $profil = $profilRepository->findOneBy([
+                        "libelle" => "apprenant"
+                    ]);
+                    $Newapprenant->setProfil($profil);
+                    $this->manager->persist($Newapprenant);
+                    $this->manager->flush();
+                }
+                // $email = $std->getEmail();
+                // $message = (new \Swift_Message("Ajout apprenant au promo"))
+                //             ->setFrom($sender)
+                //             ->setTo($std->getEmail())
+                //             ->setBody("Vous avez été ajouté au promo");
+                // $mailerStatus = $mailer->send($message);
+>>>>>>> 606c78a9475d6103fc906a7c6124e3e03368fb99
                 $promoObj->addApprenant($std);
                 }
                 $this->manager->flush();
