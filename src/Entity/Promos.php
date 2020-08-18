@@ -34,7 +34,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *              "path"="/admin/promos",
  *              "security"="is_granted('ROLE_ADMIN')",
  *              "security_message"="Acces refuse",
- *           }
+ *           },
+ *          "ajout_fileExcel"={
+ *              "method"="POST",
+ *              "route_name"="xlsx"
+ *      }
  *     },
  *     itemOperations={
  *          "setPromo"={

@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PromosController extends AbstractController
 {
@@ -424,6 +425,7 @@ class PromosController extends AbstractController
                                 ->setRoles($Newapprenant->getRoles());
                     $this->manager->persist($Newapprenant);
                     $unit->addApprenant($Newapprenant);
+                    $promoObj->addApprenant($Newapprenant);
                     $this->manager->flush();
                     // $promoObj->addApprenant($Newapprenant);  
                 }
@@ -489,9 +491,7 @@ class PromosController extends AbstractController
                                 ->setRoles($Newapprenant->getRoles());
                     $this->manager->persist($Newapprenant);
                     $promoObj->addApprenant($Newapprenant);
-                    // $this->manager->flush();
                 }
-                // dd($std);
                 else{
                 $promoObj->addApprenant($std);
                 }
@@ -679,13 +679,86 @@ class PromosController extends AbstractController
     }
 
     
-    
     private function autorisation()
-    {
-        $promo = new Promos();
-        if (!$this->isGranted("VIEW",$promo))
-            return $this->json(["message" => "Vous n'avez pas access à cette Ressource"],Response::HTTP_FORBIDDEN);
-    }
+{
+    $promo = new Promos();
+    if (!$this->isGranted("VIEW",$promo))
+        return $this->json(["message" => "Vous n'avez pas access à cette Ressource"],Response::HTTP_FORBIDDEN);
+}
+ 
+
+
+
+    //import de fichier excel
+
+    /**
+   * @Route(
+   * name="xlsx",
+   * path="api/admin/promos/upload-excel", 
+     *  methods={"POST"},
+     * defaults={
+     * "_controller"="\app\Controller\PromosController::uploadExcel",
+     *  "_api_collection_operation_name"="xlsx"
+     *     }
+   * )
+    */
+    public function uploadExcel(Request $request, ApprenantRepository $apprenantRepository, ProfilRepository $profilRepository, PromosRepository $promoRepo, MailerInterface $mailer, ResetPasswordController $reset){
+    //on recupere le fichier uploadé
+   $file = $request->files->get('file'); 
+   //l'emplacement ou on va enregistrer les fichier
+   $fileFolder = __DIR__ . '/../../public/uploads/';  
+  
+   $filePathName = md5(uniqid()) . $file->getClientOriginalName();
+      // apply md5 function to generate an unique identifier for the file and concat it with the file extension  
+            try {
+                $file->move($fileFolder, $filePathName);
+            } catch (FileException $e) {
+                dd($e);
+            }
+    //on lit le contenu du fichier excel
+    $spreadsheet = IOFactory::load($fileFolder . $filePathName); 
+    // $row = $spreadsheet->getActiveSheet(); // I added this to be able to remove the first file line 
+    //on recupere le contenu du fichier sous forme de tableau
+    $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true); 
+   //on recupere le dernier promo
+   $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
+    foreach ($sheetData as $Row) 
+        { 
+            $first_name = $Row['A']; 
+            $last_name = $Row['B']; 
+            $email= $Row['C'];  
+
+            $user_existant = $apprenantRepository->findOneBy([
+                "email" => $email
+            ]); 
+                // on verifie si l'utlisateur n'existe pas deja dans la BD
+            if (!$user_existant) 
+             {   
+                $student = new Apprenant(); 
+                $student->setPrenom($first_name);           
+                $student->setNom($last_name);
+                $student->setEmail($email);
+                $student->setPassword("password");
+                $profil = $profilRepository->findOneBy([
+                    "libelle" => "apprenant"
+                ]);
+                $student->setProfil($profil)
+                            ->setRoles($student->getRoles());
+                $this->manager->persist($student); 
+                $lastPromo->addApprenant($student);
+                $this->manager->flush(); 
+                //envoi des mails
+                $reset->processSendingPasswordResetEmail(
+                    $email,
+                    $mailer
+                );
+             } 
+        } 
+    return $this->json("Succes", 200); 
+
+}
+
+
 
 
 }

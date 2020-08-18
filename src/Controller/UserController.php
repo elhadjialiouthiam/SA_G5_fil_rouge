@@ -116,6 +116,7 @@ class UserController extends AbstractController
     */
     public function add($entite, $request)
     {
+        dd($request);
         $user = $request->request->all();
         $avatar = $request->files->get("avatar");
 
