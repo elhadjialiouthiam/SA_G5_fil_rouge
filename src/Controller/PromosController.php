@@ -4,13 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Groupe;
 use App\Entity\Promos;
+use App\Entity\Apprenant;
 use App\Repository\GroupeRepository;
+use App\Repository\ProfilRepository;
 use App\Repository\PromosRepository;
 use App\Repository\ApprenantRepository;
 use App\Repository\FormateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReferentielRepository;
+use App\Controller\ResetPasswordController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -345,14 +349,14 @@ class PromosController extends AbstractController
      *     name="addPromo"
      * )
      */
-    public function addPromo(Request $request,\Swift_Mailer $mailer,TokenStorageInterface $tokenStorage,ReferentielRepository $referentielRepository,ApprenantRepository $apprenantRepository,FormateurRepository $formateurRepository)
+    public function addPromo(Request $request,TokenStorageInterface $tokenStorage,ReferentielRepository $referentielRepository,ApprenantRepository $apprenantRepository,FormateurRepository $formateurRepository, ProfilRepository $profilRepository, ResetPasswordController $reset,MailerInterface $mailer)
     {
         $promo = new Promos();
         if (!$this->isGranted("EDIT",$promo))
             return $this->json(["message" => "Vous n'avez pas access à cette Ressource"],Response::HTTP_FORBIDDEN);
         $promoJson = $request->getContent();
         // dd($promoJson);
-        $sender = 'abdoudiallo405@gmail.com';
+        // $sender = 'abdoudiallo405@gmail.com';
         $promoTab = $this->serializer->decode($promoJson,"json");
         $referentielId = $promoTab['referentiel'][0]["id"];
 
@@ -403,20 +407,38 @@ class PromosController extends AbstractController
                 //  ->setIsDeleted(false);
             foreach ($emails as $email)
             {
+                $mailTo = $email["email"];
+                // dd($mailTo);
                 $student = $apprenantRepository->findOneBy(["email" => $email["email"]]);
-                if(!$student)
+                if($student == null)
                 {
-                    return $this->json(["message" => "L'apprenant ayant l'email: $email[email] n'existe pas."],Response::HTTP_NOT_FOUND);
+                    $Newapprenant = new Apprenant;
+                    $Newapprenant->setEMail($mailTo)
+                                ->setPassword("password")
+                                ->setPrenom("firstname")
+                                ->setNom("lastname");
+                    $profil = $profilRepository->findOneBy([
+                        "libelle" => "apprenant"
+                    ]);
+                    $Newapprenant->setProfil($profil)
+                                ->setRoles($Newapprenant->getRoles());
+                    $this->manager->persist($Newapprenant);
+                    $unit->addApprenant($Newapprenant);
+                    $this->manager->flush();
+                    // $promoObj->addApprenant($Newapprenant);  
                 }
                 // $student->setIsConnected(false);
+                else{
                 $unit->addApprenant($student);
-                $message = (new \Swift_Message("Ajout apprenant au promo"))
-                            ->setFrom($sender)
-                            ->setTo($email["email"])
-                            ->setBody("Vous avez été ajouté au promo");
-                $mailerStatus = $mailer->send($message);
+                // $this->manager->flush();
+                }
+                $this->manager->flush();
+                $reset->processSendingPasswordResetEmail(
+                    $mailTo,
+                    $mailer
+                );
                 
-                // dd($mailerStatus);
+                
             }
             $unitErrors = $this->validator->validate($unit);
             if(count($unitErrors))
@@ -444,19 +466,40 @@ class PromosController extends AbstractController
         }
         // gestion des apprenants
         if(count($students)){
-            foreach ($students as $student) {
-                $stdId = isset($student["id"]) ? $student["id"] : null;
-                $std = $apprenantRepository->findOneBy(["id"=>$stdId]);
-                if (!$std) {
-                    return $this->json(["message" => "Cet apprenant n'existe pas."],Response::HTTP_NOT_FOUND);
+            // dd($students);
+            foreach ($students as $apprenant) {
+                $email = $apprenant["email"];
+                // dd($email);
+                
+                $std = $apprenantRepository->findOneBy([
+                    "email" => $apprenant["email"]
+                ]);
+               
+              
+                if ($std == null) {
+                    $Newapprenant = new Apprenant;
+                    $Newapprenant->setEMail($apprenant["email"])
+                                ->setPassword("password")
+                                ->setPrenom("firstname")
+                                ->setNom("lastname");   
+                    $profil = $profilRepository->findOneBy([
+                        "libelle" => "apprenant"
+                    ]);
+                    $Newapprenant->setProfil($profil)
+                                ->setRoles($Newapprenant->getRoles());
+                    $this->manager->persist($Newapprenant);
+                    $promoObj->addApprenant($Newapprenant);
+                    // $this->manager->flush();
                 }
-                $email = $std->getEmail();
-                $message = (new \Swift_Message("Ajout apprenant au promo"))
-                            ->setFrom($sender)
-                            ->setTo($std->getEmail())
-                            ->setBody("Vous avez été ajouté au promo");
-                $mailerStatus = $mailer->send($message);
+                // dd($std);
+                else{
                 $promoObj->addApprenant($std);
+                }
+                $this->manager->flush();
+                $reset->processSendingPasswordResetEmail(
+                    $email,
+                    $mailer
+                );
             }
         }
         // gestion avatar
