@@ -708,8 +708,9 @@ class PromosController extends AbstractController
    //l'emplacement ou on va enregistrer les fichier
    $fileFolder = __DIR__ . '/../../public/uploads/';  
   
+   //  md5 function pour generer un unique id pour le fichier  and et le concatener avec le nom original  
    $filePathName = md5(uniqid()) . $file->getClientOriginalName();
-      // apply md5 function to generate an unique identifier for the file and concat it with the file extension  
+      
             try {
                 $file->move($fileFolder, $filePathName);
             } catch (FileException $e) {
@@ -717,10 +718,9 @@ class PromosController extends AbstractController
             }
     //on lit le contenu du fichier excel
     $spreadsheet = IOFactory::load($fileFolder . $filePathName); 
-    // $row = $spreadsheet->getActiveSheet(); // I added this to be able to remove the first file line 
     //on recupere le contenu du fichier sous forme de tableau
     $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true); 
-   //on recupere le dernier promo
+   //on recupere la derniere promo
    $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
     foreach ($sheetData as $Row) 
         { 
@@ -757,8 +757,4 @@ class PromosController extends AbstractController
     return $this->json("Succes", 200); 
 
 }
-
-
-
-
 }
