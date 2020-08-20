@@ -85,6 +85,11 @@ class Competence
      */
     private $etat;
 
+    /**
+     * @ORM\OneToMany(targetEntity=CompetencesValide::class, mappedBy="competence")
+     */
+    private $competencesValides;
+
 
     public function getId(): ?int
     {
@@ -108,6 +113,7 @@ class Competence
     {
    
         $this->niveaux = new ArrayCollection();
+        $this->competencesValides = new ArrayCollection();
     }
 
 
@@ -164,6 +170,37 @@ class Competence
     public function setEtat(?string $etat): self
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CompetencesValide[]
+     */
+    public function getCompetencesValides(): Collection
+    {
+        return $this->competencesValides;
+    }
+
+    public function addCompetencesValide(CompetencesValide $competencesValide): self
+    {
+        if (!$this->competencesValides->contains($competencesValide)) {
+            $this->competencesValides[] = $competencesValide;
+            $competencesValide->setCompetence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompetencesValide(CompetencesValide $competencesValide): self
+    {
+        if ($this->competencesValides->contains($competencesValide)) {
+            $this->competencesValides->removeElement($competencesValide);
+            // set the owning side to null (unless already changed)
+            if ($competencesValide->getCompetence() === $this) {
+                $competencesValide->setCompetence(null);
+            }
+        }
 
         return $this;
     }

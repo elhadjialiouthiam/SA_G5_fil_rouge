@@ -73,7 +73,7 @@ class Groupe
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255)
      * @Groups({"groupe:write", "groupe:read"})
      */
     private $nom;
@@ -118,10 +118,16 @@ class Groupe
      */
     private $promos;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Briefs::class, mappedBy="groupes")
+     */
+    private $briefs;
+
     public function __construct()
     {
         $this->Apprenants = new ArrayCollection();
         $this->formateurs = new ArrayCollection();
+        $this->briefs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -249,6 +255,34 @@ class Groupe
     public function setPromos(?Promos $promos): self
     {
         $this->promos = $promos;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Briefs[]
+     */
+    public function getBriefs(): Collection
+    {
+        return $this->briefs;
+    }
+
+    public function addBrief(Briefs $brief): self
+    {
+        if (!$this->briefs->contains($brief)) {
+            $this->briefs[] = $brief;
+            $brief->addGroupe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrief(Briefs $brief): self
+    {
+        if ($this->briefs->contains($brief)) {
+            $this->briefs->removeElement($brief);
+            $brief->removeGroupe($this);
+        }
 
         return $this;
     }

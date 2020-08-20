@@ -127,6 +127,11 @@ class User implements UserInterface
    
     private $type;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=ChatGeneral::class, inversedBy="user")
+     */
+    private $chatGeneral;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -269,6 +274,18 @@ class User implements UserInterface
     public function getType(): ?string
     {
         return $this->type;
+    }
+
+    public function getChatGeneral(): ?ChatGeneral
+    {
+        return $this->chatGeneral;
+    }
+
+    public function setChatGeneral(?ChatGeneral $chatGeneral): self
+    {
+        $this->chatGeneral = $chatGeneral;
+
+        return $this;
     }
 
 

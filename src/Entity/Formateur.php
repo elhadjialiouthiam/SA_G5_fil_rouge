@@ -66,6 +66,22 @@ class Formateur extends User
      */
     private $promos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Briefs::class, mappedBy="formateur")
+     */
+    private $briefs;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Commentaire::class, mappedBy="formateur")
+     */
+    private $commentaires;
+
+    public function __construct()
+    {
+        $this->briefs = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +118,68 @@ class Formateur extends User
         if ($this->promos->contains($promo)) {
             $this->promos->removeElement($promo);
             $promo->removeFormateur($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Briefs[]
+     */
+    public function getBriefs(): Collection
+    {
+        return $this->briefs;
+    }
+
+    public function addBrief(Briefs $brief): self
+    {
+        if (!$this->briefs->contains($brief)) {
+            $this->briefs[] = $brief;
+            $brief->setFormateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrief(Briefs $brief): self
+    {
+        if ($this->briefs->contains($brief)) {
+            $this->briefs->removeElement($brief);
+            // set the owning side to null (unless already changed)
+            if ($brief->getFormateur() === $this) {
+                $brief->setFormateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Commentaire[]
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaire $commentaire): self
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires[] = $commentaire;
+            $commentaire->setFormateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaire $commentaire): self
+    {
+        if ($this->commentaires->contains($commentaire)) {
+            $this->commentaires->removeElement($commentaire);
+            // set the owning side to null (unless already changed)
+            if ($commentaire->getFormateur() === $this) {
+                $commentaire->setFormateur(null);
+            }
         }
 
         return $this;

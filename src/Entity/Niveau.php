@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Webmozart\Assert\Assert;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\NiveauRepository;
@@ -47,6 +49,16 @@ class Niveau
      * @Groups({"niveau:write", "competence:read", "gc:read","competence_only"})
      */
     private $libelle;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Briefs::class, mappedBy="niveaux")
+     */
+    private $briefs;
+
+    public function __construct()
+    {
+        $this->briefs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -95,6 +107,34 @@ class Niveau
     public function setLibelle(string $libelle): self
     {
         $this->libelle = $libelle;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Briefs[]
+     */
+    public function getBriefs(): Collection
+    {
+        return $this->briefs;
+    }
+
+    public function addBrief(Briefs $brief): self
+    {
+        if (!$this->briefs->contains($brief)) {
+            $this->briefs[] = $brief;
+            $brief->addNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrief(Briefs $brief): self
+    {
+        if ($this->briefs->contains($brief)) {
+            $this->briefs->removeElement($brief);
+            $brief->removeNiveau($this);
+        }
 
         return $this;
     }
