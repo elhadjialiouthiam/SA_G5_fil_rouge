@@ -114,7 +114,11 @@ class Groupe
     private $etat;
 
     /**
+<<<<<<< HEAD
      * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="groupes",cascade={"persist"}))
+=======
+     * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="groupes", cascade={"persist"})
+>>>>>>> aee103b3c338041ac2da0cdfbfb81f3fea75e08c
      */
     private $promos;
 

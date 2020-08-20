@@ -34,7 +34,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *              "path"="/admin/promos",
  *              "security"="is_granted('ROLE_ADMIN')",
  *              "security_message"="Acces refuse",
- *           }
+ *           },
+ *          "ajout_fileExcel"={
+ *              "method"="POST",
+ *              "route_name"="xlsx"
+ *      }
  *     },
  *     itemOperations={
  *          "setPromo"={
@@ -196,7 +200,7 @@ class Promos
     private $formateur;
 
     /**
-     * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="promos",cascade={"persist"}))
+     * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="promos")
      * @Groups({"promos:read", "promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
      */
     private $groupes;
