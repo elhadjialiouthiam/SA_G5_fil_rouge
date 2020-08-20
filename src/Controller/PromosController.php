@@ -427,12 +427,9 @@ class PromosController extends AbstractController
                     $unit->addApprenant($Newapprenant);
                     $promoObj->addApprenant($Newapprenant);
                     $this->manager->flush();
-                    // $promoObj->addApprenant($Newapprenant);  
                 }
-                // $student->setIsConnected(false);
                 else{
                 $unit->addApprenant($student);
-                // $this->manager->flush();
                 }
                 $this->manager->flush();
                 $reset->processSendingPasswordResetEmail(
