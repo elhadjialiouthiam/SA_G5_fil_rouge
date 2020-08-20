@@ -70,11 +70,6 @@ class Briefs
     private $formateur;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Groupe::class, inversedBy="briefs")
-     */
-    private $groupes;
-
-    /**
      * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="briefs")
      */
     private $apprenants;
@@ -89,12 +84,16 @@ class Briefs
      */
     private $livrableAttendus;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="briefs")
+     */
+    private $briefGroupe;
+
     public function __construct()
     {
         $this->ressources = new ArrayCollection();
         $this->niveaux = new ArrayCollection();
         $this->tags = new ArrayCollection();
-        $this->groupes = new ArrayCollection();
         $this->apprenants = new ArrayCollection();
         $this->briefPromos = new ArrayCollection();
         $this->livrableAttendus = new ArrayCollection();
@@ -273,32 +272,6 @@ class Briefs
     }
 
     /**
-     * @return Collection|Groupe[]
-     */
-    public function getGroupes(): Collection
-    {
-        return $this->groupes;
-    }
-
-    public function addGroupe(Groupe $groupe): self
-    {
-        if (!$this->groupes->contains($groupe)) {
-            $this->groupes[] = $groupe;
-        }
-
-        return $this;
-    }
-
-    public function removeGroupe(Groupe $groupe): self
-    {
-        if ($this->groupes->contains($groupe)) {
-            $this->groupes->removeElement($groupe);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|Apprenant[]
      */
     public function getApprenants(): Collection
@@ -379,6 +352,18 @@ class Briefs
             $this->livrableAttendus->removeElement($livrableAttendu);
             $livrableAttendu->removeBrief($this);
         }
+
+        return $this;
+    }
+
+    public function getBriefGroupe(): ?BriefGroupe
+    {
+        return $this->briefGroupe;
+    }
+
+    public function setBriefGroupe(?BriefGroupe $briefGroupe): self
+    {
+        $this->briefGroupe = $briefGroupe;
 
         return $this;
     }
