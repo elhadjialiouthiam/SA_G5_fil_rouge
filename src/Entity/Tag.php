@@ -56,9 +56,9 @@ class Tag
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"tagsInGrpeTag:read","tag:read","Groupe_tag:read", "briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"tagsInGrpeTag:read","tag:read","Groupe_tag:read", "briefOfGroup:read", "brief:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -66,7 +66,7 @@ class Tag
      * @Assert\NotBlank(
      *      message="Le libelle est obligatoire"
      * )
-     * @Groups({"user:write", "briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"user:write", "briefOfGroup:read", "brief:read"})
      */
     private $libelle;
 
@@ -76,7 +76,7 @@ class Tag
      * @Assert\NotBlank(
      *      message="Le descriptif est obligatoire"
      * )
-     * @Groups({"user:write", "briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"user:write", "briefOfGroup:read","brief:read"})
      */
     private $descriptif;
 

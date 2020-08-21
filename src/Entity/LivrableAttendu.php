@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\LivrablesPartiels;
 use Doctrine\Common\Collections\Collection;
 use App\Repository\LivrableAttenduRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,7 +19,7 @@ class LivrableAttendu
      * @ORM\Column(type="integer")
      * @Groups({"brief:read", "briefOfGroup:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @Groups({"brief:read", "briefOfGroup:read"})
@@ -46,12 +45,6 @@ class LivrableAttendu
     private $briefs;
 
     /**
-     * @ORM\ManyToMany(targetEntity=LivrablesPartiels::class, inversedBy="livrableAttendus")
-     * @Groups({"briefOfPromo:read"})
-     */
-    private $livrablesPartiels;
-
-    /**
      * @ORM\OneToMany(targetEntity=LivrablesAprennant::class, mappedBy="livrableAttendu")
      */
     private $LivrablesAprennant;
@@ -59,7 +52,6 @@ class LivrableAttendu
     public function __construct()
     {
         $this->briefs = new ArrayCollection();
-        $this->livrablesPartiels = new ArrayCollection();
         $this->LivrablesAprennant = new ArrayCollection();
     }
 
@@ -130,31 +122,6 @@ class LivrableAttendu
         return $this;
     }
 
-    /**
-     * @return Collection|Livrablespartiels[]
-     */
-    public function getLivrablesPartiels(): Collection
-    {
-        return $this->livrablesPartiels;
-    }
-
-    public function addLivrablesPartiel(Livrablespartiels $livrablesPartiel): self
-    {
-        if (!$this->livrablesPartiels->contains($livrablesPartiel)) {
-            $this->livrablesPartiels[] = $livrablesPartiel;
-        }
-
-        return $this;
-    }
-
-    public function removeLivrablesPartiel(Livrablespartiels $livrablesPartiel): self
-    {
-        if ($this->livrablesPartiels->contains($livrablesPartiel)) {
-            $this->livrablesPartiels->removeElement($livrablesPartiel);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|LivrablesAprennant[]

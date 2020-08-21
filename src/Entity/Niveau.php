@@ -29,18 +29,19 @@ class Niveau
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only", "brief:read", "briefOfGroup:read"})
+     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only", "brief:read"})
      */
     private $critereEvaluation;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"niveau:write", "competence:read","gc:read", "competence_only", "brief:read", "briefOfGroup:read"})
+     * @Groups({"niveau:write", "competence:read","gc:read", "competence_only", "brief:read"})
      */
     private $groupeAction;
 
     /**
      * @ORM\ManyToOne(targetEntity=Competence::class, inversedBy="niveaux")
+     * @Groups({"brief:read"})
      */
     private $competence;
 

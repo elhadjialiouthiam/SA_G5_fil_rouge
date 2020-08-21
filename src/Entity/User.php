@@ -74,11 +74,14 @@ class User implements UserInterface
      * pattern="/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/",
      * message="Email Invalide"
      * )
-     * @Groups({"reset:write","user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read", "promos:write"})
+     * @Groups({"reset:write","user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read", "promos:write", "briefOfGroup:read"})
      */ 
     private $email;
 
-  
+    
+    /**
+     * Column(type="json")
+     */
     private $roles = [];
 
 
@@ -93,7 +96,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le prenom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups({"user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read"})
+     * @Groups({"user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read", "briefOfGroup:read"})
      */
     private $prenom;
 
@@ -101,7 +104,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message = "Le nom ne peut pas etre vide")
      * @Assert\Length(min = 3)
-     * @Groups({"user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read"})
+     * @Groups({"user:write","apprenant:write", "groupe:read", "groupe_apprenants:read", "user:read", "briefOfGroup:read"})
      */
     private $nom;
 

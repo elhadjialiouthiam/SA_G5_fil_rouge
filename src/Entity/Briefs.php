@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BriefsRepository;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -13,10 +14,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass=BriefsRepository::class)
  * @ApiResource(
  *      collectionOperations={
- *          "get" = {
+ *          "getAllBriefs" = {
  *          "method"="GET",
- *          "path"="/formateurs/briefs",
- *          "normalization_context" = {"groups"="brief:read"}
+ *          "route_name"="getAllBriefs",
+ *          "normalization_context" = {"groups"="brief:read"},
  * } ,
  *   "getBriefsOfAPromo"={
  *          "method"="GET",
@@ -29,7 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * }
  * },
  *  itemOperations={
- * "get",
+ *   "get",
  *      "getBriefOfGroup"={
  *          "method"="get",
  *          "path"="/formateurs/briefs/{id}",
@@ -62,18 +63,18 @@ class Briefs
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"briefOfGroup:read"})
+     * @Groups({"briefOfGroup:read", "brief:read"})
      */
     protected $id;
 
     /**
-     * @Groups({"brief:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $titre;
 
     /**
-     * @Groups({"brief:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $enonce;
@@ -85,13 +86,13 @@ class Briefs
     private $context;
 
     /**
-     * @Groups({"brief:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
 
     /**
-     * @Groups({"brief:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="date")
      */
     private $dateEcheance;
@@ -103,19 +104,19 @@ class Briefs
     private $etats;
 
     /**
-     * @Groups({"brief:read", "briefOfGroup:read"})
+     * @Groups({"brief:read"})
      * @ORM\OneToMany(targetEntity=Ressources::class, mappedBy="briefs")
      */
     private $ressources;
 
     /**
-     * @Groups({"brief:read", "briefOfGroup:read"})
+     * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
      * @ORM\ManyToMany(targetEntity=Niveau::class, inversedBy="briefs")
      */
     private $niveaux;
 
     /**
-     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="briefs")
      */
     private $tags;
@@ -129,18 +130,19 @@ class Briefs
 
     /**
      * @ORM\OneToMany(targetEntity=BriefPromo::class, mappedBy="briefs")
-     * @Groups({"briefOfGroup:read"})
+     * @Groups({"briefOfPromo:read"})
      */
     private $briefPromos;
 
     /**
      * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs")
-     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"brief:read"})
      */
     private $livrableAttendus;
 
     /**
      * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="briefs")
+     * @Groups({"briefOfGroup:read"})
      */
     private $briefGroupe;
 

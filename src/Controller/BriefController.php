@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 class BriefController extends AbstractController
 {
@@ -26,6 +28,7 @@ class BriefController extends AbstractController
 
 
     /** 
+* @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM')", message="Acces non autorisé")  
 * @Route(
 * name="getBriefOfGroup",
 * path="api/formateurs/promo/{idPromo}/groupe/{idGroup}/briefs",
@@ -54,11 +57,10 @@ class BriefController extends AbstractController
         }
         foreach ($promo->getGroupes() as $value) {
             if($groupe == $value){
-                // return new Response("trouve");
                 $briefGroupe=$groupe->getBriefGroupe();
                 $briefs = $briefGroupe->getBriefs();
                 foreach ($briefs as $value) {
-                    $valueJson = $this->serializer->serialize($value, 'json',["groups"=>["briefOfGroup:read"]]);
+                    $valueJson = $this->serializer->serialize($value, 'json',["groups"=>["brief:read", "briefOfGroup:read"]]);
                     return new JsonResponse($valueJson,Response::HTTP_OK,[],true);
                 }
             }
@@ -69,6 +71,7 @@ class BriefController extends AbstractController
     //les briefs d'un promo
 
         /** 
+* @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM') or is_granted('ROLE_APPRENANT')", message="Acces non autorisé")
 * @Route(
 * name="getBriefsOfAPromo",
 * path="api/formateurs/promos/{idPromo}/briefs",
@@ -89,16 +92,14 @@ class BriefController extends AbstractController
         foreach ($briefPromos as $briefPromo) {
             $brief[] = $briefPromo->getBriefs();
         }
-        $briefJson = $this->serializer->serialize($brief, 'json',["groups"=>["briefOfPromo:read", "briefOfGroup:read"]]);
+        $briefJson = $this->serializer->serialize($brief, 'json',["groups"=>["brief:read","briefOfPromo:read", "briefOfGroup:read"]]);
         return new JsonResponse($briefJson,Response::HTTP_OK,[],true);
-        // dd($briefPromo->getPromo());
-        // dd($briefPromo);
-
     }
 
     //affichage des briefs brouillons
 
             /** 
+* @Security("is_granted('ROLE_FORMATEUR')", message="Acces non autorisé")
 * @Route(
 * name="getBriefsBrouillon",
 * path="api/formateurs/{id}/briefs/brouillons",
@@ -119,18 +120,22 @@ class BriefController extends AbstractController
             return new Response("Formateur existant");
         }
         $briefs = $formateur->getBriefs();
-        // dd($briefs);
+        $briefTab=[];
         foreach ($briefs as $brief ) {
             if($brief->getEtats() == "brouillon"){
                 $briefTab[] = $brief;
               
             }
         }
-        $briefJson = $this->serializer->serialize($briefTab, 'json',["groups"=>["briefOfGroup:read"]]);
+        if(empty($briefTab)){
+            return $this->json(["message"=>"Aucun brief brouillons de ce formateur trouvé"]);
+        }
+        $briefJson = $this->serializer->serialize($briefTab, 'json',["groups"=>["brief:read"]]);
         return new JsonResponse($briefJson,Response::HTTP_OK,[],true);
     }
 
                 /** 
+* @Security("is_granted('ROLE_FORMATEUR')", message="Acces non autorisé") 
 * @Route(
 * name="getBriefsValides",
 * path="api/formateurs/{id}/briefs/valide",
@@ -151,7 +156,6 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
         return new Response("Formateur existant");
     }
     $briefs = $formateur->getBriefs();
-    // dd($briefs);
     $briefTab = [];
     foreach ($briefs as $brief ) {
         if($brief->getEtats() == "valide" || $brief->getEtats() == "non assigne"){
@@ -160,13 +164,14 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
         }
     }
     if(empty($briefTab)){
-       return new Response("Pas de brief validé ou non assigné"); 
+       return new Response("Aucun de brief validé ou non assigné de ce formateur"); 
     }
-    $briefJson = $this->serializer->serialize($briefTab, 'json',["groups"=>["briefOfGroup:read"]]);
+    $briefJson = $this->serializer->serialize($briefTab, 'json',["groups"=>["brief:read"]]);
     return new JsonResponse($briefJson,Response::HTTP_OK,[],true);
 }
 
 /**
+     * @Security("is_granted('ROLE_FORMATEUR')", message="Acces non autorisé")
      * @Route("/api/formateurs/promos/{idPromo}/briefs/{idBrief}",name="getBriefInPromo",methods={"GET"})
     */
     public function getBriefInPromo($idPromo,$idBrief,PromosRepository $promosRepository,BriefsRepository $briefRepository)
@@ -187,8 +192,7 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
                 {
                     if($promoBrief->getBriefs() == $brief)
                     {
-                        // return $this->json($brief,Response::HTTP_OK);
-                        $briefJson = $this->serializer->serialize($brief, 'json',["groups"=>["briefOfGroup:read"]]);
+                        $briefJson = $this->serializer->serialize($brief, 'json',["groups"=>["brief:read","briefOfPromo:read", "briefOfGroup:read"]]);
                         return new JsonResponse($briefJson,Response::HTTP_OK,[],true);
                     }
                 }
@@ -198,6 +202,7 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
     }
 
     /**
+     * @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM') or is_granted('ROLE_APPRENANT')", message="Acces non autorisé")
      * @Route("/api/apprenants/promos/{id}/briefs",name="briefOfApprenantPromo",methods={"GET"})
     */
     public function briefOfApprenantPromo(PromosRepository $promoRepo, $id){
@@ -210,19 +215,31 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
         }
 
         $briefPromos = $promo->getBriefPromos();
-        // dd($briefPromos);
         foreach ($briefPromos as $briefPromo) {
             $briefApprenant = $briefPromo->getBriefAprennant();
-            // dd($briefApprenant);
             if($briefApprenant->getStatut() == "assigne"){
                 $brief = $briefPromo->getBriefs();
-                $briefJson = $this->serializer->serialize($brief, 'json',["groups"=>["briefOfPromo:read"]]);
+                $briefJson = $this->serializer->serialize($brief, 'json',["groups"=>["brief:read","briefOfPromo:read", "briefOfGroup:read"]]);
                 return new JsonResponse($briefJson,Response::HTTP_OK,[],true);
             }
             return new Response("Pas de brief assigné");
         }
 
     }
+
+    //afficher l'ensemble des briefs
+
+    /**
+     * @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM')", message="Acces non autorisé")
+     * @Route("/api/formateurs/briefs",name="getAllBriefs",methods={"GET"})
+    */
+
+    public function getAllBriefs(BriefsRepository $briefRepo){
+        $briefs = $briefRepo->findAll();
+        $briefsJson = $this->serializer->serialize($briefs, 'json',["groups"=>["brief:read"]]);
+        return new JsonResponse($briefsJson, Response::HTTP_OK,[],true);
+    }
+
 
     
 
