@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use App\Entity\LivrablesPartiels;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\LivrableAttenduRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=LivrableAttenduRepository::class)
@@ -16,20 +18,24 @@ class LivrableAttendu
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"brief:read", "briefOfGroup:read"})
      */
     private $id;
 
     /**
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
 
     /**
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="datetime")
      */
     private $dateLivraison;
 
     /**
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $libelle;
@@ -40,7 +46,8 @@ class LivrableAttendu
     private $briefs;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Livrablespartiels::class, inversedBy="livrableAttendus")
+     * @ORM\ManyToMany(targetEntity=LivrablesPartiels::class, inversedBy="livrableAttendus")
+     * @Groups({"briefOfPromo:read"})
      */
     private $livrablesPartiels;
 

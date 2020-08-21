@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Admin;
+use App\Entity\Apprenant;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PromosRepository;
 use Doctrine\Common\Collections\Collection;
@@ -137,53 +139,53 @@ class Promos
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "briefOfGroup:read"})
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write", "briefOfGroup:read"})
      */
     private $langue;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write"})
+     * @Groups({"referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write", "briefOfGroup:read"})
      */
     private $titre;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all", "promos:write"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all", "promos:write", "briefOfGroup:read"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"referentiel:read", "promos:write"})
+     * @Groups({"referentiel:read", "promos:write", "briefOfGroup:read"})
      */
     private $lieu;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"promos:read", "promos:write"})
+     * @Groups({"promos:read", "promos:write", "briefOfGroup:read"})
      */
     private $dateDebut;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"promos:read", "promos:write"})
+     * @Groups({"promos:read", "promos:write", "briefOfGroup:read"})
      */
     private $dateFinProvisoire;
 
     /**
      * @ORM\Column(type="date", nullable=true)
-     * @Groups({"promos:write"})
+     * @Groups({"promos:write", "briefOfGroup:read"})
      */
     private $dateFinReelle;
 

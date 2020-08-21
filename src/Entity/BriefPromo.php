@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\BriefPromoRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BriefPromoRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BriefPromoRepository::class)
@@ -26,6 +27,7 @@ class BriefPromo
 
     /**
      * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="briefPromos")
+     * @Groups({"briefOfGroup:read"})
      */
     private $promo;
 

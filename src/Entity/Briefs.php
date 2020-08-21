@@ -2,13 +2,59 @@
 
 namespace App\Entity;
 
-use App\Repository\BriefsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BriefsRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BriefsRepository::class)
+ * @ApiResource(
+ *      collectionOperations={
+ *          "get" = {
+ *          "method"="GET",
+ *          "path"="/formateurs/briefs",
+ *          "normalization_context" = {"groups"="brief:read"}
+ * } ,
+ *   "getBriefsOfAPromo"={
+ *          "method"="GET",
+ *          "route_name"="getBriefsOfAPromo"
+ *          
+ * },
+ * "briefOfApprenantPromo"={
+ *      "method"="get",
+ *      "route_name"="briefOfApprenantPromo"
+ * }
+ * },
+ *  itemOperations={
+ * "get",
+ *      "getBriefOfGroup"={
+ *          "method"="get",
+ *          "path"="/formateurs/briefs/{id}",
+ *          "default"={"id"=null}
+ * },
+ *      "getBriefOfGroup"={
+ *           "method"="GET",
+ *          "route_name"="getBriefOfGroup"
+ * },
+ * "getBriefsBrouillon"={
+ *      "method"="GET",
+ *      "route_name"="getBriefsBrouillon"
+ * },
+ * "getBriefsValides"={
+ *       "method"="GET",
+ *      "route_name"="getBriefsValides"
+ * },
+ * "getOneBriefInPromo"={
+ *      "method"="GET",
+ *      "route_name"="getBriefInPromo"
+ * }
+ *
+ * }
+ * 
+ * )
  */
 class Briefs
 {
@@ -16,71 +62,80 @@ class Briefs
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfGroup:read"})
      */
-    private $id;
+    protected $id;
 
     /**
+     * @Groups({"brief:read", "briefOfPromo:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $titre;
 
     /**
+     * @Groups({"brief:read", "briefOfPromo:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $enonce;
 
     /**
+     * @Groups({"brief:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $context;
 
     /**
+     * @Groups({"brief:read", "briefOfPromo:read"})
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
 
     /**
+     * @Groups({"brief:read", "briefOfPromo:read"})
      * @ORM\Column(type="date")
      */
     private $dateEcheance;
 
     /**
+     * @Groups({"brief:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $etats;
 
     /**
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\OneToMany(targetEntity=Ressources::class, mappedBy="briefs")
      */
     private $ressources;
 
     /**
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\ManyToMany(targetEntity=Niveau::class, inversedBy="briefs")
      */
     private $niveaux;
 
     /**
+     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="briefs")
      */
     private $tags;
 
     /**
      * @ORM\ManyToOne(targetEntity=Formateur::class, inversedBy="briefs")
+     * @Groups({"briefOfGroup:read"})
      */
     private $formateur;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="briefs")
-     */
-    private $apprenants;
 
     /**
      * @ORM\OneToMany(targetEntity=BriefPromo::class, mappedBy="briefs")
+     * @Groups({"briefOfGroup:read"})
      */
     private $briefPromos;
 
     /**
      * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs")
+     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
      */
     private $livrableAttendus;
 
@@ -94,7 +149,6 @@ class Briefs
         $this->ressources = new ArrayCollection();
         $this->niveaux = new ArrayCollection();
         $this->tags = new ArrayCollection();
-        $this->apprenants = new ArrayCollection();
         $this->briefPromos = new ArrayCollection();
         $this->livrableAttendus = new ArrayCollection();
     }
@@ -271,31 +325,6 @@ class Briefs
         return $this;
     }
 
-    /**
-     * @return Collection|Apprenant[]
-     */
-    public function getApprenants(): Collection
-    {
-        return $this->apprenants;
-    }
-
-    public function addApprenant(Apprenant $apprenant): self
-    {
-        if (!$this->apprenants->contains($apprenant)) {
-            $this->apprenants[] = $apprenant;
-        }
-
-        return $this;
-    }
-
-    public function removeApprenant(Apprenant $apprenant): self
-    {
-        if ($this->apprenants->contains($apprenant)) {
-            $this->apprenants->removeElement($apprenant);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|BriefPromo[]

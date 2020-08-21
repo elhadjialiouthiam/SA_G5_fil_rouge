@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\BriefGroupeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BriefGroupeRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BriefGroupeRepository::class)
@@ -31,6 +32,7 @@ class BriefGroupe
 
     /**
      * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="briefGroupe")
+     * @Groups({"briefOfGroup:read"})
      */
     private $groupes;
 

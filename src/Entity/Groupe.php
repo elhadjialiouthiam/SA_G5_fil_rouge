@@ -69,6 +69,7 @@ class Groupe
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfGroup:read"})
      */
     private $id;
 
@@ -98,7 +99,7 @@ class Groupe
 
     /**
      * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="groupes")
-     * @Groups({"groupe:write", "groupe:read", "groupe_apprenants:read"})
+     * @Groups({"groupe:write", "groupe:read", "groupe_apprenants:read", "briefOfGroup:read"})
      */
     private $Apprenants;
 

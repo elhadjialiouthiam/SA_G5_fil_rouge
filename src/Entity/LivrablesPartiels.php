@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\LivrablesPartielsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=LivrablesPartielsRepository::class)
@@ -16,31 +17,37 @@ class LivrablesPartiels
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfPromo:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"briefOfPromo:read"})
      */
     private $libelle;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"briefOfPromo:read"})
      */
     private $lien;
 
     /**
      * @ORM\Column(type="blob")
+     * @Groups({"briefOfPromo:read"})
      */
     private $fichier;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"briefOfPromo:read"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="date")
+     * @Groups({"briefOfPromo:read"})
      */
     private $dateLivraison;
 
