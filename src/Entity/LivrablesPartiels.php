@@ -19,7 +19,7 @@ class LivrablesPartiels
      * @ORM\Column(type="integer")
      * @Groups({"briefOfPromo:read"})
      */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -56,6 +56,10 @@ class LivrablesPartiels
      */
     private $briefPromo;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="livrablesPartiels")
+     */
+    private $livrableAttendus;
 
     /**
      * @ORM\OneToMany(targetEntity=ApprenantLivrablepratielle::class, mappedBy="livrablePartielle")
@@ -64,6 +68,7 @@ class LivrablesPartiels
 
     public function __construct()
     {
+        $this->livrableAttendus = new ArrayCollection();
         $this->apprenantLivrablepratielles = new ArrayCollection();
     }
 
@@ -144,6 +149,33 @@ class LivrablesPartiels
         return $this;
     }
 
+    /**
+     * @return Collection|LivrableAttendu[]
+     */
+    public function getLivrableAttendus(): Collection
+    {
+        return $this->livrableAttendus;
+    }
+
+    public function addLivrableAttendu(LivrableAttendu $livrableAttendu): self
+    {
+        if (!$this->livrableAttendus->contains($livrableAttendu)) {
+            $this->livrableAttendus[] = $livrableAttendu;
+            $livrableAttendu->addLivrablesPartiel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivrableAttendu(LivrableAttendu $livrableAttendu): self
+    {
+        if ($this->livrableAttendus->contains($livrableAttendu)) {
+            $this->livrableAttendus->removeElement($livrableAttendu);
+            $livrableAttendu->removeLivrablesPartiel($this);
+        }
+
+        return $this;
+    }
 
     /**
      * @return Collection|ApprenantLivrablepratielle[]
