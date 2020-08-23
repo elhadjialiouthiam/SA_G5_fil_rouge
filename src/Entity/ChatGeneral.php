@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\ChatGeneralRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ChatGeneralRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
+ * @ApiResource()
  * @ORM\Entity(repositoryClass=ChatGeneralRepository::class)
  */
 class ChatGeneral
@@ -30,23 +32,24 @@ class ChatGeneral
     private $date;
 
     /**
-     * @ORM\Column(type="blob")
+     * @ORM\Column(type="blob", nullable=true)
      */
     private $PJ;
 
-    /**
-     * @ORM\OneToOne(targetEntity=Promos::class, cascade={"persist", "remove"})
-     */
-    private $promo;
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="chatGeneral")
+     * @ORM\OneToMany(targetEntity=CommentairesGenerale::class, mappedBy="chatgeneral")
      */
-    private $user;
+    private $commentairesGenerales;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Promos::class, mappedBy="chatgeneral", cascade={"persist", "remove"})
+     */
+    private $promos;
 
     public function __construct()
     {
-        $this->user = new ArrayCollection();
+        $this->commentairesGenerales = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,46 +93,55 @@ class ChatGeneral
         return $this;
     }
 
-    public function getPromo(): ?Promos
-    {
-        return $this->promo;
-    }
-
-    public function setPromo(?Promos $promo): self
-    {
-        $this->promo = $promo;
-
-        return $this;
-    }
+ 
 
     /**
-     * @return Collection|User[]
+     * @return Collection|CommentairesGenerale[]
      */
-    public function getUser(): Collection
+    public function getCommentairesGenerales(): Collection
     {
-        return $this->user;
+        return $this->commentairesGenerales;
     }
 
-    public function addUser(User $user): self
+    public function addCommentairesGenerale(CommentairesGenerale $commentairesGenerale): self
     {
-        if (!$this->user->contains($user)) {
-            $this->user[] = $user;
-            $user->setChatGeneral($this);
+        if (!$this->commentairesGenerales->contains($commentairesGenerale)) {
+            $this->commentairesGenerales[] = $commentairesGenerale;
+            $commentairesGenerale->setChatgeneral($this);
         }
 
         return $this;
     }
 
-    public function removeUser(User $user): self
+    public function removeCommentairesGenerale(CommentairesGenerale $commentairesGenerale): self
     {
-        if ($this->user->contains($user)) {
-            $this->user->removeElement($user);
+        if ($this->commentairesGenerales->contains($commentairesGenerale)) {
+            $this->commentairesGenerales->removeElement($commentairesGenerale);
             // set the owning side to null (unless already changed)
-            if ($user->getChatGeneral() === $this) {
-                $user->setChatGeneral(null);
+            if ($commentairesGenerale->getChatgeneral() === $this) {
+                $commentairesGenerale->setChatgeneral(null);
             }
         }
 
         return $this;
     }
+
+    public function getPromos(): ?Promos
+    {
+        return $this->promos;
+    }
+
+    public function setPromos(?Promos $promos): self
+    {
+        $this->promos = $promos;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newChatgeneral = null === $promos ? null : $this;
+        if ($promos->getChatgeneral() !== $newChatgeneral) {
+            $promos->setChatgeneral($newChatgeneral);
+        }
+
+        return $this;
+    }
+
 }

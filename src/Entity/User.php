@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -131,9 +133,15 @@ class User implements UserInterface
     private $type;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ChatGeneral::class, inversedBy="user")
+     * @ORM\OneToMany(targetEntity=CommentairesGenerale::class, mappedBy="user")
      */
-    private $chatGeneral;
+    private $commentairesGenerales;
+
+    public function __construct()
+    {
+        $this->commentairesGenerales = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -279,17 +287,37 @@ class User implements UserInterface
         return $this->type;
     }
 
-    public function getChatGeneral(): ?ChatGeneral
+    /**
+     * @return Collection|CommentairesGenerale[]
+     */
+    public function getCommentairesGenerales(): Collection
     {
-        return $this->chatGeneral;
+        return $this->commentairesGenerales;
     }
 
-    public function setChatGeneral(?ChatGeneral $chatGeneral): self
+    public function addCommentairesGenerale(CommentairesGenerale $commentairesGenerale): self
     {
-        $this->chatGeneral = $chatGeneral;
+        if (!$this->commentairesGenerales->contains($commentairesGenerale)) {
+            $this->commentairesGenerales[] = $commentairesGenerale;
+            $commentairesGenerale->setUser($this);
+        }
 
         return $this;
     }
+
+    public function removeCommentairesGenerale(CommentairesGenerale $commentairesGenerale): self
+    {
+        if ($this->commentairesGenerales->contains($commentairesGenerale)) {
+            $this->commentairesGenerales->removeElement($commentairesGenerale);
+            // set the owning side to null (unless already changed)
+            if ($commentairesGenerale->getUser() === $this) {
+                $commentairesGenerale->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 
 }

@@ -239,6 +239,12 @@ class Promos
      */
     private $briefPromos;
 
+    /**
+     * @ORM\OneToOne(targetEntity=ChatGeneral::class, inversedBy="promos", cascade={"persist", "remove"})
+     */
+    private $chatgeneral;
+
+
 
     public function __construct()
     {
@@ -515,6 +521,20 @@ class Promos
 
         return $this;
     }
+
+    public function getChatgeneral(): ?chatGeneral
+    {
+        return $this->chatgeneral;
+    }
+
+    public function setChatgeneral(?chatGeneral $chatgeneral): self
+    {
+        $this->chatgeneral = $chatgeneral;
+
+        return $this;
+    }
+
+
 
     
 
