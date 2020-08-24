@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Admin;
+use App\Entity\Apprenant;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PromosRepository;
 use Doctrine\Common\Collections\Collection;
@@ -137,53 +139,53 @@ class Promos
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "briefOfGroup:read"})
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write", "briefOfGroup:read"})
      */
     private $langue;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write"})
+     * @Groups({"referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write", "briefOfGroup:read"})
      */
     private $titre;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all", "promos:write"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all", "promos:write", "briefOfGroup:read"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"referentiel:read", "promos:write"})
+     * @Groups({"referentiel:read", "promos:write", "briefOfGroup:read"})
      */
     private $lieu;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"promos:read", "promos:write"})
+     * @Groups({"promos:read", "promos:write", "briefOfGroup:read"})
      */
     private $dateDebut;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"promos:read", "promos:write"})
+     * @Groups({"promos:read", "promos:write", "briefOfGroup:read"})
      */
     private $dateFinProvisoire;
 
     /**
      * @ORM\Column(type="date", nullable=true)
-     * @Groups({"promos:write"})
+     * @Groups({"promos:write", "briefOfGroup:read"})
      */
     private $dateFinReelle;
 
@@ -232,12 +234,24 @@ class Promos
      */
     private $avatar;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BriefPromo::class, mappedBy="promo")
+     */
+    private $briefPromos;
+
+    /**
+     * @ORM\OneToOne(targetEntity=ChatGeneral::class, inversedBy="promos", cascade={"persist", "remove"})
+     */
+    private $chatgeneral;
+
+
 
     public function __construct()
     {
         $this->formateur = new ArrayCollection();
         $this->groupes = new ArrayCollection();
         $this->apprenants = new ArrayCollection();
+        $this->briefPromos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -476,6 +490,53 @@ class Promos
 
         return $this;
     }
+
+    /**
+     * @return Collection|BriefPromo[]
+     */
+    public function getBriefPromos(): Collection
+    {
+        return $this->briefPromos;
+    }
+
+    public function addBriefPromo(BriefPromo $briefPromo): self
+    {
+        if (!$this->briefPromos->contains($briefPromo)) {
+            $this->briefPromos[] = $briefPromo;
+            $briefPromo->setPromo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBriefPromo(BriefPromo $briefPromo): self
+    {
+        if ($this->briefPromos->contains($briefPromo)) {
+            $this->briefPromos->removeElement($briefPromo);
+            // set the owning side to null (unless already changed)
+            if ($briefPromo->getPromo() === $this) {
+                $briefPromo->setPromo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getChatgeneral(): ?chatGeneral
+    {
+        return $this->chatgeneral;
+    }
+
+    public function setChatgeneral(?chatGeneral $chatgeneral): self
+    {
+        $this->chatgeneral = $chatgeneral;
+
+        return $this;
+    }
+
+
+
+    
 
 
     

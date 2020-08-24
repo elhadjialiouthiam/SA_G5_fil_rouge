@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Entity\User;
+use App\Entity\Promos;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AdminRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass=AdminRepository::class)
@@ -32,15 +34,22 @@ class Admin extends User
         return $this->id;
     }
 
-    /**
+ 
+     /**
      * @ORM\OneToMany(targetEntity=Promos::class, mappedBy="admin")
      */
     private $promos;
 
+    public function __construct()
+    {
+        $this->promos = new ArrayCollection();
+    }
+
+
     /**
      * @return Collection|Promos[]
      */
-    public function getPromos(): Collection
+    public function getPromos(): Promos
     {
         return $this->promos;
     }

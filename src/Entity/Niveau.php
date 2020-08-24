@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Webmozart\Assert\Assert;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\NiveauRepository;
@@ -21,32 +23,52 @@ class Niveau
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"competence:read"})
+     * @Groups({"competence:read", "brief:read","apprenantlivable:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only"})
+<<<<<<< HEAD
+     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only", "brief:read", "briefOfGroup:read","apprenantlivable:read"})
+=======
+     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only", "brief:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $critereEvaluation;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"niveau:write", "competence:read","gc:read", "competence_only"})
+<<<<<<< HEAD
+     * @Groups({"niveau:write", "competence:read","gc:read", "competence_only", "brief:read", "briefOfGroup:read","apprenantlivable:read"})
+=======
+     * @Groups({"niveau:write", "competence:read","gc:read", "competence_only", "brief:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $groupeAction;
 
     /**
      * @ORM\ManyToOne(targetEntity=Competence::class, inversedBy="niveaux")
+     * @Groups({"brief:read"})
      */
     private $competence;
 
     /**
+     * 
      * @ORM\Column(type="string", length=255)
-     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only"})
+     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only", "brief:read", "briefOfGroup:read"})
      */
     private $libelle;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Briefs::class, mappedBy="niveaux")
+     */
+    private $briefs;
+
+    public function __construct()
+    {
+        $this->briefs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -95,6 +117,34 @@ class Niveau
     public function setLibelle(string $libelle): self
     {
         $this->libelle = $libelle;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Briefs[]
+     */
+    public function getBriefs(): Collection
+    {
+        return $this->briefs;
+    }
+
+    public function addBrief(Briefs $brief): self
+    {
+        if (!$this->briefs->contains($brief)) {
+            $this->briefs[] = $brief;
+            $brief->addNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrief(Briefs $brief): self
+    {
+        if ($this->briefs->contains($brief)) {
+            $this->briefs->removeElement($brief);
+            $brief->removeNiveau($this);
+        }
 
         return $this;
     }
