@@ -60,12 +60,4 @@ class CommentairesGeneraleController extends AbstractController
 
     //fonction permettant d'envoyer un commentaire sur le chat general
 
-     /**
-     * @Route("api/users/promo/{idPromo}/user/{idUser}/chats", name="sendComment")
-     */
-    public function sendComment($idPromo, Request $request){
-        $tab = $this->serializer->decode($request->getContent(), "json");
-        dd($tab);
-        $date = new DateTime();
-    }
 }

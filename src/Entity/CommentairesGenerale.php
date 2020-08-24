@@ -13,10 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
  *          "method"="get",
  *          "route_name"="getCommentaires"
  * },
- *      "sendComment"={
- *          "method"="POST",
- *          "route_name"="sendComment"
- * }
  * }
  * )
  * @ORM\Entity(repositoryClass=CommentairesGeneraleRepository::class)
