@@ -3,12 +3,32 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ResetPasswordRequestRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestTrait;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestInterface;
 
 /**
+ * @ApiResource(
+ *      collectionOperations={
+ *      "notJoin"={
+ *          "path"="/reset_password_requests",
+ *          "method"="get",
+ *          "normalization_context"={"groups"="reset:read"}
+ * },
+ *          "relanceTout"={
+ *              "method"="get",
+ *              "route_name"="relanceTout"
+ * },
+ * },
+ *      itemOperations={
+ *          "relanceUneInvitation"={
+ *              "method"="get",
+ *              "route_name"="relanceUneInvitation"
+ * }
+ * }
+ * )
  * @ORM\Entity(repositoryClass=ResetPasswordRequestRepository::class)
  */
 class ResetPasswordRequest implements ResetPasswordRequestInterface

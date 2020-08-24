@@ -7,11 +7,13 @@ use App\Repository\UserRepository;
 use Symfony\Component\Mime\Address;
 use App\Entity\ResetPasswordRequest;
 use App\Form\ChangePasswordFormType;
+use App\Repository\ApprenantRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\ResetPasswordRequestRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -146,8 +148,6 @@ class ResetPasswordController extends AbstractController
             return new Response("Utilisateur inexistant");
         }
 
-        // return new Response('Email existant');
-
         try {
             $resetToken = $this->resetPasswordHelper->generateResetToken($user);
         } catch (ResetPasswordExceptionInterface $e) {
@@ -172,11 +172,57 @@ class ResetPasswordController extends AbstractController
                 'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
             ])
         ;
-                // dd("hey");
         $mailer->send($email);
 
         return new Response('Email de réinialisation de mot de passe envoyé');
 
         // return $this->redirectToRoute('app_reset_password');
     }
+
+
+//relance d'invitations par email des apprenants qui n'ont pas encore rejoint le plateforme
+
+//relancer ttes les invitaions
+
+/**
+ * @Route(path="api/reset/relance", name="relanceTout")
+ */
+public function relanceTout(ResetPasswordRequestRepository $resetRepo, MailerInterface $mailer){
+    $resets = $resetRepo->findAll();
+    foreach ($resets as $reset ) {
+        $apprenant = $reset->getUser();
+        $email = $apprenant->getEmail();
+        $this->processSendingPasswordResetEmail(
+            $email,
+            $mailer
+        );
+    }
+    return $this->json("Toutes les invitations relancées");
+}
+
+    //ralance d'une invitation particuliere
+
+    /**
+ * @Route(path="api/reset/relance/apprenant/{id}", name="relanceUneInvitation")
+ */
+    public function relanceUneInvitation(ResetPasswordRequestRepository $resetRepo, MailerInterface $mailer, ApprenantRepository $appRepo, $id){
+        $resets = $resetRepo->findAll();
+        $student = $appRepo->findOneBy(["id"=>$id]);
+        if(!$student){
+            return $this->json("Apprenant inexistant");
+        }
+        $email = $student->getEmail();
+        foreach ($resets as $reset ) {
+            $apprenant = $reset->getUser();
+                if($student == $apprenant){
+                    return $this->processSendingPasswordResetEmail(
+                        $email,
+                        $mailer
+                    );
+                }
+                return $this->json(null);
+        }
+
+    }
+
 }

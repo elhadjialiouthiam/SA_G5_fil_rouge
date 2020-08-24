@@ -717,6 +717,7 @@ class PromosController extends AbstractController
     $spreadsheet = IOFactory::load($fileFolder . $filePathName); 
     //on recupere le contenu du fichier sous forme de tableau
     $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true); 
+    // dd($sheetData);
    //on recupere la derniere promo
    $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
     foreach ($sheetData as $Row) 
@@ -752,6 +753,8 @@ class PromosController extends AbstractController
              } 
         } 
     return $this->json("Succes", 200); 
-
 }
+
+
+
 }
