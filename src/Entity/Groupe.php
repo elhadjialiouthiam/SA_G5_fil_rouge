@@ -71,7 +71,7 @@ class Groupe
      * @ORM\Column(type="integer")
      * @Groups({"briefOfGroup:read","apprenantlivable:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)

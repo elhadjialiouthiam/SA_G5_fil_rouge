@@ -20,7 +20,7 @@ class BriefPromo
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Briefs::class, inversedBy="briefPromos")
@@ -36,7 +36,11 @@ class BriefPromo
 
     /**
      * @ORM\OneToMany(targetEntity=LivrablesPartiels::class, mappedBy="briefPromo")
+<<<<<<< HEAD
      * 
+=======
+     * @Groups({"briefOfPromo:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $livrablePartiels;
 

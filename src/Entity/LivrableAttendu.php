@@ -20,7 +20,7 @@ class LivrableAttendu
      * @ORM\Column(type="integer")
      * @Groups({"brief:read", "briefOfGroup:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @Groups({"brief:read", "briefOfGroup:read"})
@@ -47,7 +47,6 @@ class LivrableAttendu
 
     /**
      * @ORM\ManyToMany(targetEntity=LivrablesPartiels::class, inversedBy="livrableAttendus")
-     * @Groups({"briefOfPromo:read"})
      */
     private $livrablesPartiels;
 

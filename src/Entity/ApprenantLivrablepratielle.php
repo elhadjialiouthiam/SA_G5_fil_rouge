@@ -19,7 +19,7 @@ class ApprenantLivrablepratielle
      * @ORM\Column(type="integer")
      * @Groups({"apprenantlivable:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)

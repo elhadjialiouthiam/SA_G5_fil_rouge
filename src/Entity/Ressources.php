@@ -17,19 +17,19 @@ class Ressources
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"brief:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"brief:read"})
      */
     private $lien;
 
     /**
      * @ORM\Column(type="blob", nullable=true)
-     * @Groups({"briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"brief:read"})
      */
     private $fichier;
 

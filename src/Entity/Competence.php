@@ -53,13 +53,13 @@ class Competence
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("write:addNc")
+     * @Groups({"write:addNc", "brief:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"competence:write", "competence:read", "gc:read"})
+     * @Groups({"competence:write", "competence:read", "gc:read", "brief:read"})
      */
     private $libelle;
 
@@ -70,7 +70,7 @@ class Competence
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"competence:write", "competence:read", "gc:read", "competence_only"})
+     * @Groups({"competence:write", "competence:read", "gc:read", "competence_only", "brief:read"})
      */
     private $descriptif;
 
