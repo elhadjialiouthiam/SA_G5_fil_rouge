@@ -533,6 +533,7 @@ class PromosController extends AbstractController
                     ]);
                     $Newapprenant->setProfil($profil);
                     $this->manager->persist($Newapprenant);
+                    
                     $this->manager->flush();
                 }
                 // $email = $std->getEmail();
@@ -644,7 +645,7 @@ class PromosController extends AbstractController
     {
         // dd("ghs");
         $promo = new Promos();
-        $promo = $this->promosRepository->findOneBy([
+        x = $this->promosRepository->findOneBy([
             "id"=>$id
         ]);
         // dd($promo);
