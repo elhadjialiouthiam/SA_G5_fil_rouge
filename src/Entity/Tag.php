@@ -56,9 +56,9 @@ class Tag
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"tagsInGrpeTag:read","tag:read","Groupe_tag:read"})
+     * @Groups({"tagsInGrpeTag:read","tag:read","Groupe_tag:read", "briefOfGroup:read", "brief:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -66,7 +66,7 @@ class Tag
      * @Assert\NotBlank(
      *      message="Le libelle est obligatoire"
      * )
-     * @Groups({"user:write"})
+     * @Groups({"user:write", "briefOfGroup:read", "brief:read"})
      */
     private $libelle;
 
@@ -76,7 +76,7 @@ class Tag
      * @Assert\NotBlank(
      *      message="Le descriptif est obligatoire"
      * )
-     * @Groups({"user:write"})
+     * @Groups({"user:write", "briefOfGroup:read","brief:read"})
      */
     private $descriptif;
 
@@ -86,9 +86,15 @@ class Tag
      */
     private $groupeTags;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Briefs::class, mappedBy="tags")
+     */
+    private $briefs;
+
     public function __construct()
     {
         $this->groupeTags = new ArrayCollection();
+        $this->briefs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,6 +149,34 @@ class Tag
         if ($this->groupeTags->contains($groupeTag)) {
             $this->groupeTags->removeElement($groupeTag);
             $groupeTag->removeTag($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Briefs[]
+     */
+    public function getBriefs(): Collection
+    {
+        return $this->briefs;
+    }
+
+    public function addBrief(Briefs $brief): self
+    {
+        if (!$this->briefs->contains($brief)) {
+            $this->briefs[] = $brief;
+            $brief->addTag($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrief(Briefs $brief): self
+    {
+        if ($this->briefs->contains($brief)) {
+            $this->briefs->removeElement($brief);
+            $brief->removeTag($this);
         }
 
         return $this;

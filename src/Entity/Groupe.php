@@ -69,36 +69,41 @@ class Groupe
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+<<<<<<< HEAD
      * @Groups({"groupe:write", "groupe:read"})
+=======
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
+>>>>>>> SalyBranche
      */
     private $nom;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"groupe:read"})
+     * @Groups({"groupe:read","apprenantlivable:read"})
      */
     private $datecreation;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $statut;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $type;
 
     /**
      * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="groupes")
-     * @Groups({"groupe:write", "groupe:read", "groupe_apprenants:read"})
+     * @Groups({"groupe:write", "groupe:read", "groupe_apprenants:read", "briefOfGroup:read"})
      */
     private $Apprenants;
 
@@ -117,6 +122,11 @@ class Groupe
      * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="groupes", cascade={"persist"})
      */
     private $promos;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="groupes")
+     */
+    private $briefGroupe;
 
     public function __construct()
     {
@@ -252,5 +262,19 @@ class Groupe
 
         return $this;
     }
+
+    public function getBriefGroupe(): ?BriefGroupe
+    {
+        return $this->briefGroupe;
+    }
+
+    public function setBriefGroupe(?BriefGroupe $briefGroupe): self
+    {
+        $this->briefGroupe = $briefGroupe;
+
+        return $this;
+    }
+
+    
 
 }

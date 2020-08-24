@@ -53,13 +53,13 @@ class Competence
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("write:addNc")
+     * @Groups({"write:addNc", "brief:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"competence:write", "competence:read", "gc:read"})
+     * @Groups({"competence:write", "competence:read", "gc:read", "brief:read"})
      */
     private $libelle;
 
@@ -70,7 +70,7 @@ class Competence
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"competence:write", "competence:read", "gc:read", "competence_only"})
+     * @Groups({"competence:write", "competence:read", "gc:read", "competence_only", "brief:read"})
      */
     private $descriptif;
 
@@ -84,6 +84,11 @@ class Competence
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $etat;
+
+    /**
+     * @ORM\OneToMany(targetEntity=CompetencesValide::class, mappedBy="competence")
+     */
+    private $competencesValides;
 
 
     public function getId(): ?int
@@ -108,6 +113,7 @@ class Competence
     {
    
         $this->niveaux = new ArrayCollection();
+        $this->competencesValides = new ArrayCollection();
     }
 
 
@@ -164,6 +170,37 @@ class Competence
     public function setEtat(?string $etat): self
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CompetencesValide[]
+     */
+    public function getCompetencesValides(): Collection
+    {
+        return $this->competencesValides;
+    }
+
+    public function addCompetencesValide(CompetencesValide $competencesValide): self
+    {
+        if (!$this->competencesValides->contains($competencesValide)) {
+            $this->competencesValides[] = $competencesValide;
+            $competencesValide->setCompetence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompetencesValide(CompetencesValide $competencesValide): self
+    {
+        if ($this->competencesValides->contains($competencesValide)) {
+            $this->competencesValides->removeElement($competencesValide);
+            // set the owning side to null (unless already changed)
+            if ($competencesValide->getCompetence() === $this) {
+                $competencesValide->setCompetence(null);
+            }
+        }
 
         return $this;
     }
