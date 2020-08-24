@@ -5,11 +5,13 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BriefPromoRepository;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BriefPromoRepository::class)
+ * @ApiResource()
  */
 class BriefPromo
 {
@@ -22,6 +24,7 @@ class BriefPromo
 
     /**
      * @ORM\ManyToOne(targetEntity=Briefs::class, inversedBy="briefPromos")
+     * @Groups({"apprenantlivable:read"})
      */
     private $briefs;
 
@@ -33,6 +36,7 @@ class BriefPromo
 
     /**
      * @ORM\OneToMany(targetEntity=LivrablesPartiels::class, mappedBy="briefPromo")
+     * 
      */
     private $livrablePartiels;
 

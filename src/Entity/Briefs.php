@@ -26,7 +26,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * "briefOfApprenantPromo"={
  *      "method"="get",
  *      "route_name"="briefOfApprenantPromo"
- * }
+ * },
+ *           "addBrief"={
+ *              "method"="post",
+ *              "path"="/formateurs/briefs",
+ *          },
+ * "dupliquer"={
+ *              "method"="post",
+ *              "path"="/formateurs/briefs/{id}",
+ *              "requirements"={"id"="\d+"}
+ *          },
+ * "getApprenantNews"={
+ *      "method"="Get",
+ *      "path"="/apprenants/{id}/promos/{idPromo}/briefs/{idBrief}",
+ * },
+ *      "addUrl"={
+ *          "method"="POST",
+ *          "path"="/apprenant/{id}/groupe/{id_groupe}/livrables",
+ *      }
  * },
  *  itemOperations={
  * "get",
@@ -50,7 +67,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * "getOneBriefInPromo"={
  *      "method"="GET",
  *      "route_name"="getBriefInPromo"
- * }
+ * },
+ *  "getBriefFormateurInPromo"={
+ *              "path" = "/formateurs/{id}/promos/{idPromo}/briefs/{idBrief}",
+ *              "requirements"={"id"="\d+"},
+ *              "security_message"="Vous n'avez pas access à cette Ressource",
+ *          },
+ *     "assignation"={
+ *          "method"="PUT",
+ *          "path"="/formateurs/promo/{id_promo}/brief/{id_brief}/assignation",
+ *      },
+ *      "setBriefs"={
+ *          "method"="PUT",
+ *          "path"="/formateurs/promo/{id_promo}/brief/{id_brief}",
+ *      }
+ *      
  *
  * }
  * 
@@ -67,13 +98,13 @@ class Briefs
     protected $id;
 
     /**
-     * @Groups({"brief:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $titre;
 
     /**
-     * @Groups({"brief:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $enonce;
@@ -85,7 +116,7 @@ class Briefs
     private $context;
 
     /**
-     * @Groups({"brief:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
@@ -109,20 +140,20 @@ class Briefs
     private $ressources;
 
     /**
-     * @Groups({"brief:read", "briefOfGroup:read"})
+     * @Groups({"brief:read", "briefOfGroup:read","apprenantlivable:read"})
      * @ORM\ManyToMany(targetEntity=Niveau::class, inversedBy="briefs")
      */
     private $niveaux;
 
     /**
-     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
+     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read","apprenantlivable:read"})
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="briefs")
      */
     private $tags;
 
     /**
      * @ORM\ManyToOne(targetEntity=Formateur::class, inversedBy="briefs")
-     * @Groups({"briefOfGroup:read"})
+     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
      */
     private $formateur;
 
@@ -134,15 +165,21 @@ class Briefs
     private $briefPromos;
 
     /**
-     * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs")
+     * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs", cascade={"persist"}))
      * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
      */
     private $livrableAttendus;
 
     /**
      * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="briefs")
+     * @Groups({"apprenantlivable:read"})
      */
     private $briefGroupe;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Referentiel::class, inversedBy="briefs")
+     */
+    private $referentiel;
 
     public function __construct()
     {
@@ -393,6 +430,18 @@ class Briefs
     public function setBriefGroupe(?BriefGroupe $briefGroupe): self
     {
         $this->briefGroupe = $briefGroupe;
+
+        return $this;
+    }
+
+    public function getReferentiel(): ?Referentiel
+    {
+        return $this->referentiel;
+    }
+
+    public function setReferentiel(?Referentiel $referentiel): self
+    {
+        $this->referentiel = $referentiel;
 
         return $this;
     }

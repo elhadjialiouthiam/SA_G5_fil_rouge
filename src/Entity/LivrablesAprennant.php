@@ -22,9 +22,9 @@ class LivrablesAprennant
      */
     private $lien;
 
-    /**
-     * @ORM\Column(type="blob")
-     */
+    // /**
+    //  * @ORM\Column(type="blob",nullable=true)
+    //  */
     private $fichier;
 
     /**

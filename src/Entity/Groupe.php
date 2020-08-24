@@ -69,31 +69,31 @@ class Groupe
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"briefOfGroup:read"})
+     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"groupe:read"})
+     * @Groups({"groupe:read","apprenantlivable:read"})
      */
     private $datecreation;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $statut;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $type;
 
