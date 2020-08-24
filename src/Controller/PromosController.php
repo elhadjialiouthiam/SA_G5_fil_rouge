@@ -411,16 +411,7 @@ class PromosController extends AbstractController
                 $mailTo = $email["email"];
                 // dd($mailTo);
                 $student = $apprenantRepository->findOneBy(["email" => $email["email"]]);
-<<<<<<< HEAD
                 if($student == null)
-=======
-                $mailTo = $email["email"];
-                $reset->processSendingPasswordResetEmail(
-                    $mailTo,
-                    $mailer
-                );
-                if(!$student)
->>>>>>> 606c78a9475d6103fc906a7c6124e3e03368fb99
                 {
                     $Newapprenant = new Apprenant;
                     $Newapprenant->setEMail($mailTo)
@@ -439,11 +430,6 @@ class PromosController extends AbstractController
                 }
                 else{
                 $unit->addApprenant($student);
-<<<<<<< HEAD
-<<<<<<< HEAD
-                // $this->manager->flush();
-=======
->>>>>>> SalyBranche
                 }
                 $this->manager->flush();
                 $reset->processSendingPasswordResetEmail(
@@ -451,13 +437,6 @@ class PromosController extends AbstractController
                     $mailer
                 );
                 
-=======
-                // $message = (new \Swift_Message("Ajout apprenant au promo"))
-                //             ->setFrom($sender)
-                //             ->setTo($email["email"])
-                //             ->setBody("Vous avez été ajouté au promo");
-                // $mailerStatus = $mailer->send($message);
->>>>>>> 606c78a9475d6103fc906a7c6124e3e03368fb99
                 
             }
             $unitErrors = $this->validator->validate($unit);
@@ -486,7 +465,6 @@ class PromosController extends AbstractController
         }
         // gestion des apprenants
         if(count($students)){
-<<<<<<< HEAD
             // dd($students);
             foreach ($students as $apprenant) {
                 $email = $apprenant["email"];
@@ -512,37 +490,6 @@ class PromosController extends AbstractController
                     $promoObj->addApprenant($Newapprenant);
                 }
                 else{
-=======
-            foreach ($students as $apprenant) {
-                $std = $apprenantRepository->findOneBy([
-                    "email" => $apprenant["email"]
-                ]);
-                $email = $apprenant["email"];
-                $reset->processSendingPasswordResetEmail(
-                    $email,
-                    $mailer
-                );
-                if (!$std) {
-                    $Newapprenant = new Apprenant;
-                    $Newapprenant->setEMail($apprenant["email"]);
-                    $Newapprenant->setPassword("password");
-                    $Newapprenant->setPrenom("firstname");
-                    $Newapprenant->setNom("lastname");
-                    $profil = $profilRepository->findOneBy([
-                        "libelle" => "apprenant"
-                    ]);
-                    $Newapprenant->setProfil($profil);
-                    $this->manager->persist($Newapprenant);
-                    
-                    $this->manager->flush();
-                }
-                // $email = $std->getEmail();
-                // $message = (new \Swift_Message("Ajout apprenant au promo"))
-                //             ->setFrom($sender)
-                //             ->setTo($std->getEmail())
-                //             ->setBody("Vous avez été ajouté au promo");
-                // $mailerStatus = $mailer->send($message);
->>>>>>> 606c78a9475d6103fc906a7c6124e3e03368fb99
                 $promoObj->addApprenant($std);
                 }
                 $this->manager->flush();
@@ -645,7 +592,7 @@ class PromosController extends AbstractController
     {
         // dd("ghs");
         $promo = new Promos();
-        x = $this->promosRepository->findOneBy([
+        $promo = $this->promosRepository->findOneBy([
             "id"=>$id
         ]);
         // dd($promo);
@@ -770,13 +717,14 @@ class PromosController extends AbstractController
     $spreadsheet = IOFactory::load($fileFolder . $filePathName); 
     //on recupere le contenu du fichier sous forme de tableau
     $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true); 
+    // dd($sheetData);
    //on recupere la derniere promo
    $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
     foreach ($sheetData as $Row) 
         { 
-            // $first_name = $Row['A']; 
-            // $last_name = $Row['B']; 
-            $email= $Row['A'];  
+            $first_name = $Row['A']; 
+            $last_name = $Row['B']; 
+            $email= $Row['C'];  
 
             $user_existant = $apprenantRepository->findOneBy([
                 "email" => $email
@@ -785,8 +733,8 @@ class PromosController extends AbstractController
             if (!$user_existant) 
              {   
                 $student = new Apprenant(); 
-                $student->setPrenom("firstname");           
-                $student->setNom("lastname");
+                $student->setPrenom($first_name);           
+                $student->setNom($last_name);
                 $student->setEmail($email);
                 $student->setPassword("password");
                 $profil = $profilRepository->findOneBy([
@@ -804,7 +752,7 @@ class PromosController extends AbstractController
                 );
              } 
         } 
-        return $this->json("Ajouté");
+    return $this->json("Succes", 200); 
 }
 
 
