@@ -18,18 +18,21 @@ class LivrablesPartiels
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $libelle;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $lien;
 
@@ -42,17 +45,20 @@ class LivrablesPartiels
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="date")
      * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $dateLivraison;
 
     /**
      * @ORM\ManyToOne(targetEntity=BriefPromo::class, inversedBy="livrablePartiels")
+     * @Groups({"apprenantlivable:read"})
      */
     private $briefPromo;
 

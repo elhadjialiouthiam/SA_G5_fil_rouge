@@ -27,7 +27,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * "briefOfApprenantPromo"={
  *      "method"="get",
  *      "route_name"="briefOfApprenantPromo"
- * }
+ * },
+ *           "addBrief"={
+ *              "method"="post",
+ *              "path"="/formateurs/briefs",
+ *          },
+ * "dupliquer"={
+ *              "method"="post",
+ *              "path"="/formateurs/briefs/{id}",
+ *              "requirements"={"id"="\d+"}
+ *          },
+ * "getApprenantNews"={
+ *      "method"="Get",
+ *      "path"="/apprenants/{id}/promos/{idPromo}/briefs/{idBrief}",
+ * },
+ *      "addUrl"={
+ *          "method"="POST",
+ *          "path"="/apprenant/{id}/groupe/{id_groupe}/livrables",
+ *      }
  * },
  *  itemOperations={
  *   "get",
@@ -51,7 +68,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * "getOneBriefInPromo"={
  *      "method"="GET",
  *      "route_name"="getBriefInPromo"
- * }
+ * },
+ *  "getBriefFormateurInPromo"={
+ *              "path" = "/formateurs/{id}/promos/{idPromo}/briefs/{idBrief}",
+ *              "requirements"={"id"="\d+"},
+ *              "security_message"="Vous n'avez pas access à cette Ressource",
+ *          },
+ *     "assignation"={
+ *          "method"="PUT",
+ *          "path"="/formateurs/promo/{id_promo}/brief/{id_brief}/assignation",
+ *      },
+ *      "setBriefs"={
+ *          "method"="PUT",
+ *          "path"="/formateurs/promo/{id_promo}/brief/{id_brief}",
+ *      }
+ *      
  *
  * }
  * 
@@ -68,13 +99,21 @@ class Briefs
     protected $id;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
      * @Groups({"brief:read", "briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="string", length=255)
      */
     private $titre;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
      * @Groups({"brief:read", "briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="string", length=255)
      */
     private $enonce;
@@ -86,7 +125,11 @@ class Briefs
     private $context;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
      * @Groups({"brief:read", "briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
@@ -110,20 +153,28 @@ class Briefs
     private $ressources;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfGroup:read","apprenantlivable:read"})
+=======
      * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\ManyToMany(targetEntity=Niveau::class, inversedBy="briefs")
      */
     private $niveaux;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
      * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="briefs")
      */
     private $tags;
 
     /**
      * @ORM\ManyToOne(targetEntity=Formateur::class, inversedBy="briefs")
-     * @Groups({"briefOfGroup:read"})
+     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
      */
     private $formateur;
 
@@ -135,16 +186,30 @@ class Briefs
     private $briefPromos;
 
     /**
+<<<<<<< HEAD
+     * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs", cascade={"persist"}))
+     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
+=======
      * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs")
      * @Groups({"brief:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $livrableAttendus;
 
     /**
      * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="briefs")
+<<<<<<< HEAD
+     * @Groups({"apprenantlivable:read"})
+=======
      * @Groups({"briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $briefGroupe;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Referentiel::class, inversedBy="briefs")
+     */
+    private $referentiel;
 
     public function __construct()
     {
@@ -395,6 +460,18 @@ class Briefs
     public function setBriefGroupe(?BriefGroupe $briefGroupe): self
     {
         $this->briefGroupe = $briefGroupe;
+
+        return $this;
+    }
+
+    public function getReferentiel(): ?Referentiel
+    {
+        return $this->referentiel;
+    }
+
+    public function setReferentiel(?Referentiel $referentiel): self
+    {
+        $this->referentiel = $referentiel;
 
         return $this;
     }
