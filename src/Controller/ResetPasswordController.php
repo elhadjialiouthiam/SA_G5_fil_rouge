@@ -200,7 +200,7 @@ public function relanceTout(ResetPasswordRequestRepository $resetRepo, MailerInt
     return $this->json("Toutes les invitations relancées");
 }
 
-    //ralance d'une invitation particuliere
+    //relance d'une invitation particuliere
 
     /**
  * @Route(path="api/reset/relance/apprenant/{id}", name="relanceUneInvitation")
