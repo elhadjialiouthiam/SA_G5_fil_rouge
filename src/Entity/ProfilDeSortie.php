@@ -8,37 +8,35 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProfilDeSortieRepository;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *   attributes = {
- *       "security":"is_granted('ROLE_ADMIN')",
- *       "security_message":"Seuls les admins ont acces à cette ressource" 
- *    },
  *   collectionOperations={
- *      "add_ps"={
+ *      "addProfiDeSortie"={
  *          "method"="post",
- *          "path"="/admin/profil_de_sorties"
+ *          "path"="api/admin/profilsorties"
  * },
  *      "show_profil_sortie" = {
  *          "method"="GET",
  *          "route_name"="show_profil_sortie"
- *          }
- *      },
+ * },
+ *      "getStudentsByPs"={
+ *          "method"="GET",
+ *          "route_name"="getStudentsByPs"
+ * }
+ * },
  *    itemOperations={
- *          "show_one_ps"={
+ * "get",
+ *          "getStudentsOfAPs"={
  *              "method"="get",
- *              "path"="/admin/profil_de_sorties/{id}"
+ *              "route_name"="getStudentsOfAPs"
  * },
  *          "update_ps"={
  *              "method"="put",
- *              "path"="/admin/profil_de_sorties/{id}"
- * },
- *        "archive_profil_sortie" = {
- *          "method"="DELETE",
- *          "route_name" = "archive_profilSortie"
+ *              "path"="/admin/profilsorties/{id}"
  * }
- *      }
+ * }
  * )
  * @ORM\Entity(repositoryClass=ProfilDeSortieRepository::class)
  */
@@ -53,6 +51,7 @@ class ProfilDeSortie
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"ps:read"})
      */
     private $libelle;
 
@@ -63,6 +62,7 @@ class ProfilDeSortie
 
     /**
      * @ORM\OneToMany(targetEntity=Apprenant::class, mappedBy="profilDeSortie")
+     * @Groups({"ps:read"})
      */
     private $apprenants;
 

@@ -9,7 +9,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *  denormalizationContext={"groups":{"comment:write"}},
  *  collectionOperations={
  *      "getCommentaires"={
  *          "method"="GET",

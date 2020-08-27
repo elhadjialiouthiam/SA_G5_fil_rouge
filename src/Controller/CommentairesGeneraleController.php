@@ -15,9 +15,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\CommentairesGeneraleRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ *@Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM') or is_granted('ROLE_APPRENANT')", message="Acces non autorisé")
+*/
 class CommentairesGeneraleController extends AbstractController
 {
     private $serializer,
@@ -69,6 +73,7 @@ class CommentairesGeneraleController extends AbstractController
     //les commentaires par jour d'un user
 
     /**
+     * 
      * @Route("api/users/promo/{idPromo}/user/chats", name="getCommentaires", methods={"GET"})
      */
     public function getCommentaires($idPromo)
