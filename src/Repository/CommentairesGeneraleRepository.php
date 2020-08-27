@@ -80,4 +80,33 @@ class CommentairesGeneraleRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getDayOfComments($chat){
+        return $this->createQueryBuilder('c')
+            ->select('SUBSTRING(c.date, 1, 10) as day')
+            // ->where('c.user = :val1')
+            ->andWhere('c.chatgeneral = :val2')
+            // ->setParameter('val1', $user)
+            ->setParameter('val2', $chat)
+            ->orderBy('c.date', 'ASC')
+            ->groupBy('day')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getCommentsOfADayAllUsers($day, $chat){
+        return $this->createQueryBuilder('c')
+            ->select('c as msg')
+            ->orderBy('c.date', 'ASC')
+            ->where('SUBSTRING(c.date, 1, 10) = :val1')
+            // ->andWhere('c.user = :val2')
+            ->andWhere('c.chatgeneral = :val3')
+            ->setParameter('val1', $day)
+            // ->setParameter('val2', $user)
+            ->setParameter('val3', $chat)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

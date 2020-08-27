@@ -2,17 +2,27 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CommentairesGeneraleRepository;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
+ *  denormalizationContext={"groups":{"comment:write"}},
  *  collectionOperations={
  *      "getCommentaires"={
- *          "method"="get",
+ *          "method"="GET",
  *          "route_name"="getCommentaires"
  * },
+ *      "getCommentsOfAStudent"={
+ *          "method"="GET",
+ *          "route_name"="getCommentsOfAStudent"
+ * },
+ *      "sendComment"={
+ *          "method"="POST",
+ *          "route_name"="sendComment"
+ * }
  * }
  * )
  * @ORM\Entity(repositoryClass=CommentairesGeneraleRepository::class)

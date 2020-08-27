@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BriefController extends AbstractController
 {
@@ -241,7 +241,19 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
 
     }
 
-<<<<<<< HEAD
+    //afficher l'ensemble des briefs
+
+    /**
+     * @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM')", message="Acces non autorisé")
+     * @Route("/api/formateurs/briefs",name="getAllBriefs",methods={"GET"})
+    */
+
+    public function getAllBriefs(BriefsRepository $briefRepo){
+        $briefs = $briefRepo->findAll();
+        $briefsJson = $this->serializer->serialize($briefs, 'json',["groups"=>["brief:read"]]);
+        return new JsonResponse($briefsJson, Response::HTTP_OK,[],true);
+    }
+
     /**
      * @Route("/api/formateurs/{id}/promos/{idPromo}/briefs/{idBrief}",name="getBriefFormateurInPromo",methods={"GET"})
     */
@@ -313,23 +325,30 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
     /**
      * @Route("/api/formateurs/briefs/{id}",name="dupliquer",methods={"POST"})
     */
-    public function dupliquer($id, BriefsRepository $briefRepository, FormateurRepository $formateurRepo, ReferentielRepository $refRepo, NiveauRepository $niveauRpo, LivrableAttenduRepository $lvrAttenduRep,TagRepository $tagRepo, RessourcesRepository $ressourceRepo)
+    public function dupliquer($id,TokenStorageInterface $tokenStorage, BriefsRepository $briefRepository, FormateurRepository $formateurRepo, ReferentielRepository $refRepo, NiveauRepository $niveauRpo, LivrableAttenduRepository $lvrAttenduRep,TagRepository $tagRepo, RessourcesRepository $ressourceRepo)
     {
         $briefs = $briefRepository->findOneBy([
             "id"=>$id
         ]);
         if ($briefs) {
-            $brief = new Briefs();
-            $brief->setTitre($briefs->getTitre())
+            $newBrief = new Briefs();
+            $newBrief->setTitre($briefs->getTitre())
                   ->setEnonce($briefs->getEnonce())
                   ->setContext($briefs->getContext())
                   ->setCreatedAt($briefs->getCreatedAt())
                   ->setDateEcheance($briefs->getDateEcheance())
                   ->setEtats($briefs->getEtats())
                   ->setBriefGroupe($briefs->getBriefGroupe());
-            $this->manager->persist($brief);
+            $formateur = $tokenStorage->getToken()->getUser();
+                  // on l'affecte le formateur actuellement connecté
+            $newBrief->setFormateur($formateur);
+                  // on lui desafete le briefpromo de l'ancien
+            foreach ($newBrief->getBriefPromos() as $briefPromo) {
+                $newBrief->removeBriefPromo($briefPromo);
+            }
+            $this->manager->persist($newBrief);
             $this->manager->flush();
-            return $this->json("done");
+            return new JsonResponse("Brief dupliqué avec succes",Response::HTTP_OK,[],true);
         }
         return $this->json(["message" => "Impossible de dupliquer un brief qui n'existe pas."],Response::HTTP_NOT_FOUND);
     }
@@ -337,7 +356,7 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
     /**
      * @Route("/api/formateurs/briefs",name="addBrief",methods={"POST"})
     */
-    public function addBrief(Request $request,GroupeRepository $grpeRepo, BriefGroupeRepository $briefGroupeRepo ,BriefsRepository $briefRepository, FormateurRepository $formateurRepo, ReferentielRepository $refRepo, NiveauRepository $niveauRpo, LivrableAttenduRepository $lvrAttenduRep,TagRepository $tagRepo, RessourcesRepository $ressourceRepo)
+    public function addBrief(Request $request,\Swift_Mailer $mailer, GroupeRepository $grpeRepo, BriefGroupeRepository $briefGroupeRepo ,BriefsRepository $briefRepository, FormateurRepository $formateurRepo, ReferentielRepository $refRepo, NiveauRepository $niveauRpo, LivrableAttenduRepository $lvrAttenduRep,TagRepository $tagRepo, RessourcesRepository $ressourceRepo)
     {
         $brief = new Briefs();
         $briefjson = $request->getContent();
@@ -437,6 +456,7 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
         if ($groupes) {
             
             foreach ($groupes as $groupe) {
+                //dd($groupe);
                 if ($grpeRepo->findOneBy(["id"=>$groupe['id']])) {
                     $brifGroupe->addGroupe($grpeRepo->findOneBy(["id"=>$groupe['id']]));
                     $promo = $grpeRepo->findOneBy(["id"=>$groupe['id']])->getPromos();
@@ -444,12 +464,18 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
                     $briefPromo->setPromo($promo);
                     $briefPromo->setBriefs($briefObj);
                     $this->manager->persist($briefPromo);
+                    
+                    foreach ($grpeRepo->findOneBy(["id"=>$groupe['id']])->getApprenants() as $value) {
+                        //dd($value);
+                        $this->sendEmail($mailer, $value, $briefObj);
+                    }
                 }
             }
             
+            
         }
         $this->manager->flush();
-        return $this->json("done");
+        return new JsonResponse("Brief ajouté avec succés",Response::HTTP_OK,[],true);
     }
     /**
      * @Route("/api/formateurs/promo/{id_promo}/brief/{id_brief}/assignation",name="assignation",methods={"PUT"})
@@ -581,7 +607,7 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
 
                         $briefObj = $this->serializer->denormalize($briefTab, "App\Entity\Briefs");
                         if ($etat) {
-                            dd("etat");
+                            
                             $brief->setEtats($etat);
                             $this->manager->flush();
                             return $this->json(["message" => "statut changé avec succés"]);
@@ -782,22 +808,15 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
         }
         
     }
-=======
-    //afficher l'ensemble des briefs
-
-    /**
-     * @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM')", message="Acces non autorisé")
-     * @Route("/api/formateurs/briefs",name="getAllBriefs",methods={"GET"})
-    */
-
-    public function getAllBriefs(BriefsRepository $briefRepo){
-        $briefs = $briefRepo->findAll();
-        $briefsJson = $this->serializer->serialize($briefs, 'json',["groups"=>["brief:read"]]);
-        return new JsonResponse($briefsJson, Response::HTTP_OK,[],true);
-    }
-
 
     
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
-
+    
+    public function sendEmail(\Swift_Mailer $mailer, $user, $brief)
+    {
+        $msg = (new \Swift_Message('Sonatel Academy'))
+            ->setFrom('abdoudiallo405@gmail.com')
+            ->setTo($user->getEmail())
+            ->setBody("Vous avez été assigné au brief " . strtoupper($brief->getTitre()) . ".Veuillez vous connecter sur la plateforme pour voir les détails.");
+        $mailer->send($msg);
+    }
 }
