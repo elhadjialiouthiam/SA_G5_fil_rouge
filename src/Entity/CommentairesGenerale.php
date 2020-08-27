@@ -9,6 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
+ * denormalizationContext={"groups":{"chat:write"}},
  *  collectionOperations={
  *      "getCommentaires"={
  *          "method"="GET",
@@ -44,6 +45,7 @@ class CommentairesGenerale
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"chat:write"})
      */
     private $libelle;
 
@@ -54,6 +56,7 @@ class CommentairesGenerale
 
     /**
      * @ORM\Column(type="blob", nullable=true)
+     * @Groups({"chat:write"})
      */
     private $pj;
 

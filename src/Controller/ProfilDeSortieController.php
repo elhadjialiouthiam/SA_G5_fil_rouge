@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -25,7 +26,9 @@ class ProfilDeSortieController extends AbstractController
         $this->psRepo = $psRepo;
         $this->promoRepo = $promoRepo;
     }
+
         /**
+         * @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM')", message="Acces non autorisé")
      * @Route(path="api/admin/profilsorties", name="show_profil_sortie", methods={"GET"})
      */
     public function showProfilsSortie(){
@@ -39,6 +42,7 @@ class ProfilDeSortieController extends AbstractController
 
     //afficher les apprenants d'une promo par profil de sortie
      /**
+      * @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM')", message="Acces non autorisé")
      * @Route(path="api/admin/promo/{idPromo}/profilsorties", name="getStudentsByPs", methods={"GET"})
      */
 
@@ -73,6 +77,7 @@ class ProfilDeSortieController extends AbstractController
     //afficher les apprenants d'un profil de sortie d'une promo
 
     /**
+     * @Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM')", message="Acces non autorisé")
      * @Route(path="api/admin/promo/{idPromo}/profilsorties/{idPs}", name="getStudentsOfAPs", methods={"GET"})
      */
     public function getStudentsOfAPs($idPromo, $idPs){

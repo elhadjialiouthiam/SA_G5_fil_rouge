@@ -12,10 +12,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
+ * denormalizationContext={"groups":{"ps:write"}},
  *   collectionOperations={
  *      "addProfiDeSortie"={
  *          "method"="post",
- *          "path"="api/admin/profilsorties"
+ *          "path"="api/admin/profilsorties",
+ *          "security" = "is_granted('ROLE_FORMATEUR')",
+ *           "security_message" = "Accès non autorisé"
  * },
  *      "show_profil_sortie" = {
  *          "method"="GET",
@@ -34,7 +37,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * },
  *          "update_ps"={
  *              "method"="put",
- *              "path"="/admin/profilsorties/{id}"
+ *              "path"="/admin/profilsorties/{id}",
+ *              "security" = "is_granted('ROLE_FORMATEUR')",
+ *              "security_message" = "Accès non autorisé"
  * }
  * }
  * )
@@ -51,7 +56,7 @@ class ProfilDeSortie
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"ps:read"})
+     * @Groups({"ps:read", "ps:write"})
      */
     private $libelle;
 
@@ -62,7 +67,7 @@ class ProfilDeSortie
 
     /**
      * @ORM\OneToMany(targetEntity=Apprenant::class, mappedBy="profilDeSortie")
-     * @Groups({"ps:read"})
+     * @Groups({"ps:read", "ps:write"})
      */
     private $apprenants;
 

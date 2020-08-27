@@ -717,14 +717,11 @@ class PromosController extends AbstractController
     $spreadsheet = IOFactory::load($fileFolder . $filePathName); 
     //on recupere le contenu du fichier sous forme de tableau
     $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true); 
-    // dd($sheetData);
    //on recupere la derniere promo
    $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
     foreach ($sheetData as $Row) 
         { 
-            $first_name = $Row['A']; 
-            $last_name = $Row['B']; 
-            $email= $Row['C'];  
+            $email= $Row['A'];  
 
             $user_existant = $apprenantRepository->findOneBy([
                 "email" => $email
@@ -733,8 +730,8 @@ class PromosController extends AbstractController
             if (!$user_existant) 
              {   
                 $student = new Apprenant(); 
-                $student->setPrenom($first_name);           
-                $student->setNom($last_name);
+                $student->setPrenom("firstname");           
+                $student->setNom("lastname");
                 $student->setEmail($email);
                 $student->setPassword("password");
                 $profil = $profilRepository->findOneBy([
@@ -752,7 +749,7 @@ class PromosController extends AbstractController
                 );
              } 
         } 
-    return $this->json("Succes", 200); 
+        return $this->json("Ajouté");
 }
 
 
