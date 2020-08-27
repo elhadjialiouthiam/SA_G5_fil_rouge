@@ -2,17 +2,37 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CommentairesGeneraleRepository;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
+ * denormalizationContext={"groups":{"chat:write"}},
  *  collectionOperations={
  *      "getCommentaires"={
- *          "method"="get",
+ *          "method"="GET",
  *          "route_name"="getCommentaires"
  * },
+<<<<<<< HEAD
+=======
+ *      "getCommentsOfAStudent"={
+ *          "method"="GET",
+ *          "route_name"="getCommentsOfAStudent"
+ * },
+ *      "studentSendComment"={
+ *          "method"="POST",
+ *          "route_name"="studentSendComment"
+ * },
+ *      "userSendComment"={
+ *          "method"="POST",
+ *          "route_name"="userSendComment"
+ * }
+ * },
+ * itemOperations={
+ *  "get"
+>>>>>>> SalyBranchePerso
  * }
  * )
  * @ORM\Entity(repositoryClass=CommentairesGeneraleRepository::class)
@@ -28,6 +48,7 @@ class CommentairesGenerale
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"chat:write"})
      */
     private $libelle;
 
@@ -38,6 +59,7 @@ class CommentairesGenerale
 
     /**
      * @ORM\Column(type="blob", nullable=true)
+     * @Groups({"chat:write"})
      */
     private $pj;
 
