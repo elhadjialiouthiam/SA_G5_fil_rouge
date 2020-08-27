@@ -52,6 +52,7 @@ class Apprenant extends User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"ps:read"})
      */
     protected $id;
 
