@@ -722,9 +722,7 @@ class PromosController extends AbstractController
    $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
     foreach ($sheetData as $Row) 
         { 
-            $first_name = $Row['A']; 
-            $last_name = $Row['B']; 
-            $email= $Row['C'];  
+            $email= $Row['A'];  
 
             $user_existant = $apprenantRepository->findOneBy([
                 "email" => $email

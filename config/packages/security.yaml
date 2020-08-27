@@ -42,7 +42,7 @@ security:
         - { path: ^/api/docs, roles: IS_AUTHENTICATED_ANONYMOUSLY } # Allows accessing the Swagger UI
         - { path: ^/api/reset_password, roles: IS_ANONYMOUS }
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/users, roles: ROLE_ADMIN }
+        # - { path: ^/api/users, roles: ROLE_ADMIN }
         - { path: ^/api/admin/groupes, roles: ROLE_FORMATEUR }
 
     role_hierarchy:

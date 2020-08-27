@@ -15,9 +15,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\CommentairesGeneraleRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ *@Security("is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM') or is_granted('ROLE_APPRENANT')", message="Acces non autorisé")
+*/
 class CommentairesGeneraleController extends AbstractController
 {
     private $serializer,
@@ -26,9 +30,8 @@ class CommentairesGeneraleController extends AbstractController
             $userRepo,
             $apprenantRepo,
             $chatRepo,
-            $manager,
-            $tokenStorage;
-    public function __construct(SerializerInterface $serializer, CommentairesGeneraleRepository $commentRepo, PromosRepository $promoRepo, UserRepository $userRepo, ApprenantRepository $apprenantRepo, ChatGeneralRepository $chatRepo, EntityManagerInterface $manager, TokenStorageInterface $tokenStorage){
+            $manager;
+    public function __construct(SerializerInterface $serializer, CommentairesGeneraleRepository $commentRepo, PromosRepository $promoRepo, UserRepository $userRepo, ApprenantRepository $apprenantRepo, ChatGeneralRepository $chatRepo, EntityManagerInterface $manager){
         $this->serializer = $serializer;
         $this->commentRepo = $commentRepo;
         $this->promoRepo = $promoRepo;
@@ -36,7 +39,6 @@ class CommentairesGeneraleController extends AbstractController
         $this->apprenantRepo = $apprenantRepo;
         $this->chatRepo = $chatRepo;
         $this->manager = $manager;
-        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -63,14 +65,7 @@ class CommentairesGeneraleController extends AbstractController
         foreach ($apprenantsOfPromo as $apprenantOfPromo ) {
             if($apprenant == $apprenantOfPromo){
                 $days = $this->commentRepo->getDay($apprenant, $chatGeneral);
-                $tab=[];
-                foreach($days as $day){
-                    $month = $this->commentRepo->getCommentsOfADay($day["day"], $apprenant, $chatGeneral);
-                    $day["msg"]=$month;
-                    $tab[]=$day;
-                }
-                $tabJson = $this->serializer->serialize($tab, "json");
-                return new Response($tabJson, Response::HTTP_OK,[],true);
+                return $this->commentDuJour($days, $apprenant, $chatGeneral);
             }
         }
     }
@@ -78,12 +73,11 @@ class CommentairesGeneraleController extends AbstractController
     //les commentaires par jour d'un user
 
     /**
+     * 
      * @Route("api/users/promo/{idPromo}/user/chats", name="getCommentaires", methods={"GET"})
      */
     public function getCommentaires($idPromo)
     {
-        // dd("hey");
-        // dd("hey");
         $promo = $this->promoRepo->findOneBy([
             "id" => $idPromo
         ]);
@@ -91,91 +85,107 @@ class CommentairesGeneraleController extends AbstractController
         if(!$promo){
             return $this->json(["message" => "Promo inexistante"]);
         }
-        //on verifie si l'apprenant existe et est de ce promo
-        // $user = $this->userRepo->findOneBy(["id" => $idAp]);
-        // if(!$user){
-        //     return $this->json(["message" => "Utilisateur inexistant"]);  
-        // }
-        
         //on cherche le chat general correspondant à ce promo
         $chatGeneral = $promo->getChatgeneral();
         $days = $this->commentRepo->getDayOfComments($chatGeneral);
-        // dd($days);
-        $tab=[];
-        foreach($days as $day){
-            $month = $this->commentRepo->getCommentsOfADayAllUsers($day["day"], $chatGeneral);
-            $day["msg"]=$month;
-            $tab[]=$day;
-        }
-        $tabJson = $this->serializer->serialize($tab, "json");
-        return new Response($tabJson, Response::HTTP_OK,[],true);
+        return $this->commentDuJour($days, null, $chatGeneral);
     }
 
     //fonction permettant d'envoyer un commentaire sur le chat general
 
      /**
-     * @Route("api/users/promo/{idPromo}/apprenant/{idAp}/chats", name="sendComment", methods={"POST"})
+     * @Route("api/users/promo/{idPromo}/apprenant/{idAp}/chats", name="studentSendComment", methods={"POST"})
      */
-    public function sendComment($idPromo, $idAp, Request $request){
+    public function studentSendComment($idPromo, $idAp, Request $request){
      //on teste si la promo existe
      $promo = $this->promoRepo->findOneBy(["id" => $idPromo]);
-
-
-        $date = new DateTime;
-    
-        // dd($request->getContent());
-        // $requete =$request->getContent();
-        // $comment = $this->serializer->decode($requete, "json");
-        // dd($comment);
-        $comment = $request->request->all();
-    //    dd($comment);
-        $pj = $request->files->get("pj");
-        $pj= fopen($pj->getRealPath(), 'rb');
-
-        $libelle = $comment["libelle"];
-        // $comment["pj"] = $pj;
-        // $comment["date"] = $date;
-        //on recupere le chat general correspondant a l'id donné
-        $chatId = $comment["chatgeneral"];
-        $chat = $this->chatRepo->findOneBy(["id"=>$chatId]);
-        $userId = $comment["user"];
-        $user = $this->userRepo->findOneBy(["id"=>$userId]);
-        // $comment["chatgeneral"] = $chat;
-       
-        // dd($user);
-        // $user = $this->tokenStorage->getToken()->getUser();
-        // dd($user);
-        // $comment["user"]= $user;
-        // dd($chat);
-        // dd($comment);
-        // dd($comment);
-        $commentJson = $this->serializer->encode($comment, "json");
-        // dd($commentJson);
-        // dd($commentJson["libelle"]);
-        // $commentObj = $this->serializer->denormalize($comment, "App/Entity/CommentairesGeneral", true);
-        $commentObj = $this->serializer->deserialize($commentJson, CommentairesGenerale::class, "json");
-        // dd($commentObj);
-        $commentObj->setLibelle($libelle);
-        $commentObj->setPj($pj);
-        $commentObj->setUser($user);
-        $commentObj->setchatgeneral($chat);
-        $commentObj->setDate($date);
-        // dd($commentObj);
-        $this->manager->persist($commentObj);
-        $this->manager->flush();
-        // return $this->json($commentObj);
-        // dd($pj)
-        //idAp => id de l'apprenant qui envoie le commentaire
-        // $date = new DateTime;
-        // $requestTab = $this->serializer->decode($request->getContent(), "json");
-        // dd($requestTab);
-        // dd($requestTab["libelle"]);
-        // $comment = new CommentairesGenerale;
-
-        // dd($date);
-
-        //afaire 
-        //utiliser apprenantRepo, faire les tests necessaires
-        //l'apprenant c le mm apprenant dont on a l'id sur url
+        if(!$promo){
+            return $this->json(["message" => "Promo inexistante"]);
+        }
+        $apprenant = $this->apprenantRepo->findOneBy(["id" => "$idAp"]);
+        if(!$apprenant){
+            return $this->json(["message" => "Apprenant inexistant"]);
+        }
+        //on verifie si l'apprenant est dans la promo
+        $students = $promo->getApprenants();
+        foreach($students as $student){
+            if($apprenant == $student){
+                $comment = $request->request->all();
+                $chat = $promo->getChatgeneral();
+                //on verifie si y'a un chat general sur ce promo
+                if(!$chat){
+                    return $this->json(["message"=>"Aucun chat concernant ce promo"]);
+                }
+                return $this->toComment($request, $apprenant, $chat);
+            }
+        }
     }
+
+    //envoyer un commentaire en tant qu'utilisateur
+
+     /**
+     * @Route("api/users/promo/{idPromo}/user/{idUser}/chats", name="userSendComment", methods={"POST"})
+     */
+
+     public function userSendComment($idPromo, $idUser, Request $request){
+         //on teste si la promo existe
+        $promo = $this->promoRepo->findOneBy(["id" => $idPromo]);
+        if(!$promo){
+            return $this->json(["message" => "Promo inexistante"]);
+        }
+        $comment = $request->request->all();
+        //on recupere le chat general correspondant a ce promo
+        $chat = $promo->getChatgeneral();
+        if(!$chat){
+            return $this->json(["message"=>"Aucun chat concernant ce promo"]);
+        }
+        //on teste si l'utilisateur existe dans notre BD
+        $user = $this->userRepo->findOneBy(["id" => $idUser]);
+        if(!$user){
+            return $this->json(["message" => "Utilisateur inexistant"]);
+        }
+        return $this->toComment($request, $user, $chat);
+     }
+
+     //function permettant a un user d'emettre un commentaire
+     private function toComment($request, $user, $chat){
+         $comment = $request->request->all();
+         $date = new DateTime;
+         $libelle = $comment["libelle"];
+         $commentJson = $this->serializer->encode($comment, "json");
+         $commentObj = $this->serializer->deserialize($commentJson, CommentairesGenerale::class, "json");
+         $commentObj->setLibelle($libelle);
+         if($request->files->get("pj")){
+            $pj = $request->files->get("pj");
+            $pj= fopen($pj->getRealPath(), 'rb');
+            $commentObj->setPj($pj);
+        }
+         $commentObj->setUser($user);
+         $commentObj->setchatgeneral($chat);
+         $commentObj->setDate($date);
+         $this->manager->persist($commentObj);
+         $this->manager->flush();
+         return $this->json(["message" => "Commentaire envoyé"]);
+     }
+
+     //fonction permettant de lister les commentaires pour chaque jour sur un chat
+     private function commentDuJour($days, $apprenant=null, $chatGeneral){
+        $tab=[];
+        foreach($days as $day){
+            if($apprenant){
+                $comments = $this->commentRepo->getCommentsOfADay($day["day"], $apprenant, $chatGeneral);
+            }
+            $comments = $this->commentRepo->getCommentsOfADayAllUsers($day["day"], $chatGeneral);
+            foreach($comments as $comment){
+                if($comment["msg"]->getPj()){
+                    $pj = base64_encode(stream_get_contents($comment["msg"]->getPj()));
+                    $comment["msg"]->setPj($pj);
+                }
+                $day["msg"][]=$comment;                     
+            }
+            $tab[]=$day;
+        }
+        $tabJson = $this->serializer->serialize($tab, "json");
+        return new Response($tabJson, Response::HTTP_OK,[],true);
+     }
 }
