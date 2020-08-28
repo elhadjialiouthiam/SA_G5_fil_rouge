@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\LivrablesAprennantRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\Repository\LivrablesAprennantRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=LivrablesAprennantRepository::class)
+ * @ApiResource(
+ * )
  */
 class LivrablesAprennant
 {

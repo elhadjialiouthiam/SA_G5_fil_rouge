@@ -74,6 +74,7 @@ class GroupCompetences
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"ApprenantCompetence:read"})
      */
     private $id;
 
@@ -93,6 +94,7 @@ class GroupCompetences
      * @ORM\ManyToMany(targetEntity=Competence::class, inversedBy="groupCompetences", cascade={"persist"})
      * @ApiSubresource
      * @Groups({"gc:read", "competence_only"})
+     * @Groups({"ApprenantCompetence:read"})
      */
     private $competences;
 

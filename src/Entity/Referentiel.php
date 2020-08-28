@@ -67,6 +67,7 @@ class Referentiel
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"ApprenantCompetence:read"})
      * @Groups({"referentiel:read_all","promo_ref_GrpeCompet_Competences:read","promos:read","referentiel:read","promo_ref_formateurs_apprenants:read"})
      */
     private $id;
@@ -104,6 +105,7 @@ class Referentiel
 
     /**
      * @ORM\ManyToMany(targetEntity=GroupCompetences::class, inversedBy="referentiels",cascade={"persist"})
+     * @Groups({"ApprenantCompetence:read"})
      * @Groups({"referentiel:read_all","promo_ref_GrpeCompet_Competences:read","promos:read","referentiel:read"})
      */
     private $groupeComptence;

@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ApprenantLivrablepratielleRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use App\Repository\ApprenantLivrablepratielleRepository;
 
 /**
  * @ORM\Entity(repositoryClass=ApprenantLivrablepratielleRepository::class)
@@ -37,17 +38,24 @@ class ApprenantLivrablepratielle
     /**
      * @ORM\ManyToOne(targetEntity=LivrablesPartiels::class, inversedBy="apprenantLivrablepratielles")
      */
-    private $livrablePartielle;
+    private $livrablesPartiels;
 
     /**
      * @ORM\ManyToOne(targetEntity=Apprenant::class, inversedBy="apprenantLivrablepratielles")
+     * @Groups({"ApprenantCompetence:read"})
      */
-    private $appranant;
+    private $apprenant;
 
     /**
      * @ORM\OneToMany(targetEntity=Commentaire::class, mappedBy="apprenantLivrablepratielle")
+     * @Groups({"commentaire:read"})
      */
     private $commentaire;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $Statut;
 
     public function __construct()
     {
@@ -95,14 +103,14 @@ class ApprenantLivrablepratielle
         return $this;
     }
 
-    public function getLivrablePartielle(): ?LivrablesPartiels
+    public function getLivrablePartielle()
     {
-        return $this->livrablePartielle;
+        return $this->livrablesPartiels;
     }
 
-    public function setLivrablePartielle(?LivrablesPartiels $livrablePartielle): self
+    public function setLivrablePartielle(?LivrablesPartiels $livrablesPartiels): self
     {
-        $this->livrablePartielle = $livrablePartielle;
+        $this->livrablesPartiels = $livrablesPartiels;
 
         return $this;
     }
@@ -146,6 +154,18 @@ class ApprenantLivrablepratielle
                 $commentaire->setApprenantLivrablepratielle(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStatut(): ?string
+    {
+        return $this->Statut;
+    }
+
+    public function setStatut(string $Statut): self
+    {
+        $this->Statut = $Statut;
 
         return $this;
     }

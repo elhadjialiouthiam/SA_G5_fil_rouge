@@ -144,6 +144,7 @@ class Promos
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
+     * @Groups({"ApprenantCompetence:read"})
      * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write"})
      */
     private $langue;
@@ -190,6 +191,7 @@ class Promos
     /**
      * @ORM\ManyToOne(targetEntity=Referentiel::class, inversedBy="promos",cascade={"persist"})
      * @Groups({"promo_ref_GrpeCompet_Competences:read","promos:read","promo_ref_formateurs_apprenants:read", "promos:write"})
+     * @Groups({"ApprenantCompetence:read"})
      */
     private $referentiel;
 

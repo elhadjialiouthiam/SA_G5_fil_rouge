@@ -23,19 +23,19 @@ class Niveau
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"competence:read"})
+     * @Groups({"apprenant_competence:read","competence:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only"})
+     * @Groups({"apprenant_competence:read","niveau:write", "competence:read", "gc:read","competence_only"})
      */
     private $critereEvaluation;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"niveau:write", "competence:read","gc:read", "competence_only"})
+     * @Groups({"apprenant_competence:read","niveau:write", "competence:read","gc:read", "competence_only"})
      */
     private $groupeAction;
 
@@ -46,7 +46,7 @@ class Niveau
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"niveau:write", "competence:read", "gc:read","competence_only"})
+     * @Groups({"apprenant_competence:read","niveau:write", "competence:read", "gc:read","competence_only"})
      */
     private $libelle;
 

@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\CompetencesValideRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CompetencesValideRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=CompetencesValideRepository::class)
@@ -14,11 +15,13 @@ class CompetencesValide
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"apprenant_competence:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"apprenant_competence:read"})
      */
     private $etat;
 
@@ -29,6 +32,7 @@ class CompetencesValide
 
     /**
      * @ORM\ManyToOne(targetEntity=Competence::class, inversedBy="competencesValides")
+     * @Groups({"apprenant_competence:read"})
      */
     private $competence;
 

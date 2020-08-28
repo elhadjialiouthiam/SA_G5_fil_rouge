@@ -2,11 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\CommentaireRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CommentaireRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=CommentaireRepository::class)
+ * @ORM\Entity(repositoryClass=LivrablesAprennantRepository::class)
+ * @ApiResource(
+ * )
  */
 class Commentaire
 {
@@ -14,16 +19,19 @@ class Commentaire
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"commentaire:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"commentaire:read"})
      */
     private $contenu;
 
     /**
      * @ORM\Column(type="date")
+     * @Groups({"commentaire:read"})
      */
     private $date;
 
@@ -34,8 +42,14 @@ class Commentaire
 
     /**
      * @ORM\ManyToOne(targetEntity=Formateur::class, inversedBy="commentaires")
+     * @Groups({"commentaire:read"})
      */
     private $formateur;
+
+    /**
+     * @ORM\Column(type="blob")
+     */
+    private $PieceJointe;
 
     public function getId(): ?int
     {
@@ -86,6 +100,18 @@ class Commentaire
     public function setFormateur(?Formateur $formateur): self
     {
         $this->formateur = $formateur;
+
+        return $this;
+    }
+
+    public function getPieceJointe()
+    {
+        return $this->PieceJointe;
+    }
+
+    public function setPieceJointe($PieceJointe): self
+    {
+        $this->PieceJointe = $PieceJointe;
 
         return $this;
     }

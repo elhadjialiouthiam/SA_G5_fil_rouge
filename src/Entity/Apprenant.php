@@ -52,6 +52,7 @@ class Apprenant extends User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"apprenant_competence:read",})
      */
     protected $id;
 
@@ -68,6 +69,7 @@ class Apprenant extends User
 
     /**
      * @ORM\ManyToOne(targetEntity=Promos::class, inversedBy="apprenants", cascade={"persist"})
+     * @Groups({"ApprenantCompetence:read"})
      */
         private $promos;
 
@@ -93,6 +95,7 @@ class Apprenant extends User
 
         /**
          * @ORM\OneToMany(targetEntity=CompetencesValide::class, mappedBy="apprenant")
+         * @Groups({"apprenant_competence:read",})
          */
         private $competencesValides;
 

@@ -75,7 +75,6 @@ class GroupCompetencesController extends AbstractController
     ]);
     $requete = $request->getContent();
     $competences = $groupComp->getCompetences();
-    // dd($competences);
     $competenceArray = $serializer->decode($requete, "json");
   
     $theNewCompetence = $comRepo->findOneBy([

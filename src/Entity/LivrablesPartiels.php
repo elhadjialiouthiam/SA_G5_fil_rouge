@@ -2,13 +2,76 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\LivrablesPartielsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=LivrablesPartielsRepository::class)
+ * @ApiResource(
+ *  collectionOperations={
+ *     "get_competences_by_apprenant"={
+ *         "method"="GET",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
+ *         "route_name"="show_competences_by_apprenant"
+ *     },
+ *     "get_competences_by_apprenant_id"={
+ *         "method"="GET",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "access_control"="(is_granted('ROLE_APPRENANT') or is_granted('ROLE_ADMIN'))",
+ *         "route_name"="show_competences_by_apprenant_id"
+ *     },
+ *     "get_statistiques_by_apprenant_id"={
+ *         "method"="GET",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "access_control"="(is_granted('ROLE_APPRENANT') or is_granted('ROLE_ADMIN'))",
+ *         "route_name"="show_statistiques_by_apprenant_id"
+ *     },
+ *     "get_statistiques_by_competences"={
+ *         "method"="GET",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM'))",
+ *         "route_name"="show_statistiques_by_competences"
+ *     },
+ *     "get_commentaires_by_LivrablesPartiels"={
+ *         "method"="GET",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "access_control"="(is_granted('ROLE_FORMATEUR') or is_granted('ROLE_APPRENANT) or is_granted('ROLE_ADMIN'))",
+ *         "route_name"="get_commentaires_by_livrablePartiel"
+ *     },
+ *     "post_commentaire_by_formateur"={
+ *         "method"="POST",
+ *         "access_control"="(is_granted('ROLE_FORMATEUR') or is_granted('ROLE_ADMIN'))",
+ *         "path"="/formateurs/livrablespartiels/{id_livrable}/commentaires",
+ *         "path"="/apprenant/livrablespartiels/{id_livrable}/commentaires",
+ *     }, 
+ *     "post_commentaire_by_apprenant"={
+ *         "method"="POST",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "path"="/apprenant/livrablespartiels/id/commentaires",
+ *         "access_control"="(is_granted('ROLE_APPRENANT') or is_granted('ROLE_ADMIN'))",
+ *     },
+ *  },
+ *  itemOperations={
+ *      "add_livrable_partiel_by_formateur"={
+ *         "method"="PUT",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "access_control"="(is_granted('ROLE_FORMATEUR') or is_granted('ROLE_ADMIN'))",
+ *         "route_name"="put_livrable_partiel_by_formateur"
+ *     },
+ * 
+ *     "add_statut_by_apprenant"={
+ *         "method"="PUT",
+ *         "controller"=LivrablesPartielsController::class,
+ *         "access_control"="(is_granted('ROLE_FORMATEUR') or is_granted('ROLE_ADMIN'))",
+ *         "route_name"="put_statut_by_apprenant"
+ *     },
+ *  },
+ * )
  */
 class LivrablesPartiels
 {
@@ -45,7 +108,7 @@ class LivrablesPartiels
     private $dateLivraison;
 
     /**
-     * @ORM\ManyToOne(targetEntity=BriefPromo::class, inversedBy="livrablePartiels")
+     * @ORM\ManyToOne(targetEntity=BriefPromo::class, inversedBy="livrablesPartiels")
      */
     private $briefPromo;
 
@@ -55,9 +118,15 @@ class LivrablesPartiels
     private $livrableAttendus;
 
     /**
-     * @ORM\OneToMany(targetEntity=ApprenantLivrablepratielle::class, mappedBy="livrablePartielle")
+     * @ORM\OneToMany(targetEntity=ApprenantLivrablepratielle::class, mappedBy="livrablesPartiels")
+     * @Groups({"commentaire:read"})
      */
     private $apprenantLivrablepratielles;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted=false;
 
     public function __construct()
     {
@@ -197,6 +266,18 @@ class LivrablesPartiels
                 $apprenantLivrablepratielle->setLivrablePartielle(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
 
         return $this;
     }

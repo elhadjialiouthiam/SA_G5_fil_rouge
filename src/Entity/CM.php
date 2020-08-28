@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\CM;
+
 use App\Entity\User;
 use App\Repository\CMRepository;
 use Doctrine\ORM\Mapping as ORM;
