@@ -241,7 +241,6 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
 
     }
 
-<<<<<<< HEAD
     /**
      * @Route("/api/formateurs/{id}/promos/{idPromo}/briefs/{idBrief}",name="getBriefFormateurInPromo",methods={"GET"})
     */
@@ -782,7 +781,6 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
         }
         
     }
-=======
     //afficher l'ensemble des briefs
 
     /**
@@ -798,6 +796,5 @@ public function getBriefsValides($id, FormateurRepository $formateurRepo){
 
 
     
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
 
 }
