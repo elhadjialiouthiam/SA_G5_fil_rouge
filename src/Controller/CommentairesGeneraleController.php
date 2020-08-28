@@ -149,6 +149,7 @@ class CommentairesGeneraleController extends AbstractController
 
      //function permettant a un user d'emettre un commentaire
      private function toComment($request, $user, $chat){
+        //  $pj = null;
          $comment = $request->request->all();
          $date = new DateTime;
          $libelle = $comment["libelle"];
@@ -179,7 +180,8 @@ class CommentairesGeneraleController extends AbstractController
             foreach($comments as $comment){
                 if($comment["msg"]->getPj()){
                     $pj = base64_encode(stream_get_contents($comment["msg"]->getPj()));
-                    $comment["msg"]->setPj($pj);
+                    fclose($comment["msg"]->getPj());
+                    $comment["msg"]->setPj($pj); 
                 }
                 $day["msg"][]=$comment;                     
             }
