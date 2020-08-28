@@ -15,8 +15,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "method"="GET",
  *          "route_name"="getCommentaires"
  * },
-<<<<<<< HEAD
-=======
  *      "getCommentsOfAStudent"={
  *          "method"="GET",
  *          "route_name"="getCommentsOfAStudent"
@@ -32,7 +30,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * },
  * itemOperations={
  *  "get"
->>>>>>> SalyBranchePerso
  * }
  * )
  * @ORM\Entity(repositoryClass=CommentairesGeneraleRepository::class)

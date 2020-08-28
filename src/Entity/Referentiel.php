@@ -124,7 +124,6 @@ class Referentiel
      * @ORM\OneToMany(targetEntity=CompetencesValide::class, mappedBy="referentiel")
      */
     private $competencesValides;
-
     /**
      * @ORM\OneToMany(targetEntity=Briefs::class, mappedBy="referentiel")
      */
@@ -302,7 +301,6 @@ class Referentiel
 
         return $this;
     }
-
     /**
      * @return Collection|Briefs[]
      */

@@ -33,9 +33,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *              "path"="/formateurs/briefs",
  *          },
  * "dupliquer"={
- *              "method"="post",
+ *              "method"="POST",
  *              "path"="/formateurs/briefs/{id}",
- *              "requirements"={"id"="\d+"}
+ *              "requirements"={"id"="\d+"},
+ *              "route_name"="dupliquer"
  *          },
  * "getApprenantNews"={
  *      "method"="Get",
@@ -99,21 +100,15 @@ class Briefs
     protected $id;
 
     /**
-<<<<<<< HEAD
      * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
-=======
      * @Groups({"brief:read", "briefOfGroup:read"})
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="string", length=255)
      */
     private $titre;
 
     /**
-<<<<<<< HEAD
      * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
-=======
      * @Groups({"brief:read", "briefOfGroup:read"})
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="string", length=255)
      */
     private $enonce;
@@ -125,11 +120,8 @@ class Briefs
     private $context;
 
     /**
-<<<<<<< HEAD
      * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
-=======
      * @Groups({"brief:read", "briefOfGroup:read"})
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
@@ -153,21 +145,15 @@ class Briefs
     private $ressources;
 
     /**
-<<<<<<< HEAD
      * @Groups({"brief:read", "briefOfGroup:read","apprenantlivable:read"})
-=======
      * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\ManyToMany(targetEntity=Niveau::class, inversedBy="briefs")
      */
     private $niveaux;
 
     /**
-<<<<<<< HEAD
      * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read","apprenantlivable:read"})
-=======
      * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="briefs")
      */
     private $tags;
@@ -186,23 +172,17 @@ class Briefs
     private $briefPromos;
 
     /**
-<<<<<<< HEAD
      * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs", cascade={"persist"}))
      * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
-=======
      * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs")
      * @Groups({"brief:read"})
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $livrableAttendus;
 
     /**
      * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="briefs")
-<<<<<<< HEAD
      * @Groups({"apprenantlivable:read"})
-=======
      * @Groups({"briefOfGroup:read"})
->>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $briefGroupe;
 
@@ -225,6 +205,10 @@ class Briefs
         return $this->id;
     }
 
+    public function resetId(){
+        return $this->id = null;
+    }
+    
     public function getTitre(): ?string
     {
         return $this->titre;

@@ -32,7 +32,7 @@ class BriefGroupe
 
     /**
      * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="briefGroupe")
-     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
+     * @Groups({"briefOfGroup:read"})
      */
     private $groupes;
 

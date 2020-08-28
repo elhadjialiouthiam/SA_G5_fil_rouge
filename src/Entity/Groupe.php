@@ -69,35 +69,31 @@ class Groupe
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
+     * @Groups({"briefOfGroup:read"})
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-<<<<<<< HEAD
      * @Groups({"groupe:write", "groupe:read"})
-=======
-     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
->>>>>>> SalyBranche
      */
     private $nom;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"groupe:read","apprenantlivable:read"})
+     * @Groups({"groupe:read"})
      */
     private $datecreation;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
+     * @Groups({"groupe:write", "groupe:read"})
      */
     private $statut;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
+     * @Groups({"groupe:write", "groupe:read"})
      */
     private $type;
 
