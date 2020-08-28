@@ -138,13 +138,11 @@ class UserController extends AbstractController
             $errors = $this->serializer->serialize($errors,'json');
             return new JsonResponse($errors,Response::HTTP_BAD_REQUEST,[],true);
         }
-        // fclose($avatar);
-        // $data->setPassword($this->passwordEncoder->encodePassword($user,$user->getPassword()));
-
         $user->setRoles($user->getRoles());
         $user->setPassword($this->encoder->encodePassword($user,"password"));
         $this->manager->persist($user);
         $this->manager->flush();
+        fclose($avatar);
         return new JsonResponse("Créé avec success",Response::HTTP_CREATED,[],true);
     }
 
