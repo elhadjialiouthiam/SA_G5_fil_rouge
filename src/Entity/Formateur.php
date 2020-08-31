@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\User;
+use App\Entity\Promos;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FormateurRepository;
 use Doctrine\Common\Collections\Collection;
@@ -54,6 +55,7 @@ class Formateur extends User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfGroup:read"})
      */
     protected $id;
 

@@ -427,12 +427,9 @@ class PromosController extends AbstractController
                     $unit->addApprenant($Newapprenant);
                     $promoObj->addApprenant($Newapprenant);
                     $this->manager->flush();
-                    // $promoObj->addApprenant($Newapprenant);  
                 }
-                // $student->setIsConnected(false);
                 else{
                 $unit->addApprenant($student);
-                // $this->manager->flush();
                 }
                 $this->manager->flush();
                 $reset->processSendingPasswordResetEmail(
@@ -724,9 +721,7 @@ class PromosController extends AbstractController
    $lastPromo = $promoRepo->findOneBy([], ['id' => 'desc']);
     foreach ($sheetData as $Row) 
         { 
-            $first_name = $Row['A']; 
-            $last_name = $Row['B']; 
-            $email= $Row['C'];  
+            $email= $Row['A'];  
 
             $user_existant = $apprenantRepository->findOneBy([
                 "email" => $email
@@ -735,8 +730,8 @@ class PromosController extends AbstractController
             if (!$user_existant) 
              {   
                 $student = new Apprenant(); 
-                $student->setPrenom($first_name);           
-                $student->setNom($last_name);
+                $student->setPrenom("firstname");           
+                $student->setNom("lastname");
                 $student->setEmail($email);
                 $student->setPassword("password");
                 $profil = $profilRepository->findOneBy([
@@ -754,7 +749,9 @@ class PromosController extends AbstractController
                 );
              } 
         } 
-    return $this->json("Succes", 200); 
-
+        return $this->json("Ajouté");
 }
+
+
+
 }

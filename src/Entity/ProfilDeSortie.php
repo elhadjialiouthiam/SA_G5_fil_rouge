@@ -8,37 +8,40 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProfilDeSortieRepository;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *   attributes = {
- *       "security":"is_granted('ROLE_ADMIN')",
- *       "security_message":"Seuls les admins ont acces à cette ressource" 
- *    },
+ * denormalizationContext={"groups":{"ps:write"}},
  *   collectionOperations={
- *      "add_ps"={
+ *      "addProfiDeSortie"={
  *          "method"="post",
- *          "path"="/admin/profil_de_sorties"
+ *          "path"="api/admin/profilsorties",
+ *          "security" = "is_granted('ROLE_FORMATEUR')",
+ *           "security_message" = "Accès non autorisé"
  * },
  *      "show_profil_sortie" = {
  *          "method"="GET",
  *          "route_name"="show_profil_sortie"
- *          }
- *      },
+ * },
+ *      "getStudentsByPs"={
+ *          "method"="GET",
+ *          "route_name"="getStudentsByPs"
+ * }
+ * },
  *    itemOperations={
- *          "show_one_ps"={
+ * "get",
+ *          "getStudentsOfAPs"={
  *              "method"="get",
- *              "path"="/admin/profil_de_sorties/{id}"
+ *              "route_name"="getStudentsOfAPs"
  * },
  *          "update_ps"={
  *              "method"="put",
- *              "path"="/admin/profil_de_sorties/{id}"
- * },
- *        "archive_profil_sortie" = {
- *          "method"="DELETE",
- *          "route_name" = "archive_profilSortie"
+ *              "path"="/admin/profilsorties/{id}",
+ *              "security" = "is_granted('ROLE_FORMATEUR')",
+ *              "security_message" = "Accès non autorisé"
  * }
- *      }
+ * }
  * )
  * @ORM\Entity(repositoryClass=ProfilDeSortieRepository::class)
  */
@@ -53,6 +56,7 @@ class ProfilDeSortie
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"ps:read", "ps:write"})
      */
     private $libelle;
 
@@ -63,6 +67,7 @@ class ProfilDeSortie
 
     /**
      * @ORM\OneToMany(targetEntity=Apprenant::class, mappedBy="profilDeSortie")
+     * @Groups({"ps:read", "ps:write"})
      */
     private $apprenants;
 

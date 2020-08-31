@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\LivrablesPartielsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -79,36 +78,48 @@ class LivrablesPartiels
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $libelle;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $lien;
 
     /**
      * @ORM\Column(type="blob")
+     * @Groups({"briefOfPromo:read"})
      */
     private $fichier;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="date")
+     * @Groups({"briefOfPromo:read"})
+     * @Groups({"apprenantlivable:read"})
      */
     private $dateLivraison;
 
     /**
-     * @ORM\ManyToOne(targetEntity=BriefPromo::class, inversedBy="livrablesPartiels")
+     * @ORM\ManyToOne(targetEntity=BriefPromo::class, inversedBy="livrablePartiels")
+     * @Groups({"apprenantlivable:read"})
      */
     private $briefPromo;
 

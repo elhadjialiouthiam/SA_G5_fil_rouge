@@ -23,30 +23,32 @@ class Niveau
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"apprenant_competence:read","competence:read"})
+     * @Groups({"competence:read", "brief:read","apprenantlivable:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"apprenant_competence:read","niveau:write", "competence:read", "gc:read","competence_only"})
+     * @Groups({"apprenant_competence:read","niveau:write", "competence:read", "gc:read","competence_only" , "brief:read"})
      */
     private $critereEvaluation;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"apprenant_competence:read","niveau:write", "competence:read","gc:read", "competence_only"})
+     * @Groups({"apprenant_competence:read","niveau:write", "competence:read","gc:read", "competence_only" , "brief:read", "briefOfGroup:read","apprenantlivable:read" , "brief:read"})
      */
     private $groupeAction;
 
     /**
      * @ORM\ManyToOne(targetEntity=Competence::class, inversedBy="niveaux")
+     * @Groups({"brief:read"})
      */
     private $competence;
 
     /**
+     * 
      * @ORM\Column(type="string", length=255)
-     * @Groups({"apprenant_competence:read","niveau:write", "competence:read", "gc:read","competence_only"})
+     * @Groups({"apprenant_competence:read","niveau:write", "competence:read", "gc:read","competence_only" , "brief:read", "briefOfGroup:read"})
      */
     private $libelle;
 

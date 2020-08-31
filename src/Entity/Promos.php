@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Admin;
+use App\Entity\Apprenant;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PromosRepository;
 use Doctrine\Common\Collections\Collection;
@@ -137,54 +139,58 @@ class Promos
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "briefOfGroup:read"})
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
+<<<<<<< HEAD
      * @Groups({"ApprenantCompetence:read"})
      * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write"})
+=======
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write", "briefOfGroup:read"})
+>>>>>>> 41348378c5ffc5ad16f37bad6f052ba8fa343f86
      */
     private $langue;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write"})
+     * @Groups({"referentiel:read","promoFormateurApprenant:read_all","promo_groupe_apprenants:read","promo_ref_formateurs_apprenants:read", "promos:write", "briefOfGroup:read"})
      */
     private $titre;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all", "promos:write"})
+     * @Groups({"promo_ref_GrpeCompet_Competences:read","referentiel:read","promoFormateurApprenant:read_all", "promos:write", "briefOfGroup:read"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"promos:read"})
-     * @Groups({"referentiel:read", "promos:write"})
+     * @Groups({"referentiel:read", "promos:write", "briefOfGroup:read"})
      */
     private $lieu;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"promos:read", "promos:write"})
+     * @Groups({"promos:read", "promos:write", "briefOfGroup:read"})
      */
     private $dateDebut;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"promos:read", "promos:write"})
+     * @Groups({"promos:read", "promos:write", "briefOfGroup:read"})
      */
     private $dateFinProvisoire;
 
     /**
      * @ORM\Column(type="date", nullable=true)
-     * @Groups({"promos:write"})
+     * @Groups({"promos:write", "briefOfGroup:read"})
      */
     private $dateFinReelle;
 
@@ -238,6 +244,12 @@ class Promos
      * @ORM\OneToMany(targetEntity=BriefPromo::class, mappedBy="promo")
      */
     private $briefPromos;
+
+    /**
+     * @ORM\OneToOne(targetEntity=ChatGeneral::class, inversedBy="promos", cascade={"persist", "remove"})
+     */
+    private $chatgeneral;
+
 
 
     public function __construct()
@@ -515,6 +527,20 @@ class Promos
 
         return $this;
     }
+
+    public function getChatgeneral(): ?chatGeneral
+    {
+        return $this->chatgeneral;
+    }
+
+    public function setChatgeneral(?chatGeneral $chatgeneral): self
+    {
+        $this->chatgeneral = $chatgeneral;
+
+        return $this;
+    }
+
+
 
     
 

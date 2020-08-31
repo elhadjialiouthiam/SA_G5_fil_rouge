@@ -2,13 +2,91 @@
 
 namespace App\Entity;
 
-use App\Repository\BriefsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BriefsRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BriefsRepository::class)
+ * @ApiResource(
+ *      collectionOperations={
+ *          "getAllBriefs" = {
+ *          "method"="GET",
+ *          "route_name"="getAllBriefs",
+ *          "normalization_context" = {"groups"="brief:read"},
+ * } ,
+ *   "getBriefsOfAPromo"={
+ *          "method"="GET",
+ *          "route_name"="getBriefsOfAPromo"
+ *          
+ * },
+ * "briefOfApprenantPromo"={
+ *      "method"="get",
+ *      "route_name"="briefOfApprenantPromo"
+ * },
+ *           "addBrief"={
+ *              "method"="post",
+ *              "path"="/formateurs/briefs",
+ *          },
+ * "dupliquer"={
+ *              "method"="post",
+ *              "path"="/formateurs/briefs/{id}",
+ *              "requirements"={"id"="\d+"}
+ *          },
+ * "getApprenantNews"={
+ *      "method"="Get",
+ *      "path"="/apprenants/{id}/promos/{idPromo}/briefs/{idBrief}",
+ * },
+ *      "addUrl"={
+ *          "method"="POST",
+ *          "path"="/apprenant/{id}/groupe/{id_groupe}/livrables",
+ *      }
+ * },
+ *  itemOperations={
+ *   "get",
+ *      "getBriefOfGroup"={
+ *          "method"="get",
+ *          "path"="/formateurs/briefs/{id}",
+ *          "default"={"id"=null}
+ * },
+ *      "getBriefOfGroup"={
+ *           "method"="GET",
+ *          "route_name"="getBriefOfGroup"
+ * },
+ * "getBriefsBrouillon"={
+ *      "method"="GET",
+ *      "route_name"="getBriefsBrouillon"
+ * },
+ * "getBriefsValides"={
+ *       "method"="GET",
+ *      "route_name"="getBriefsValides"
+ * },
+ * "getOneBriefInPromo"={
+ *      "method"="GET",
+ *      "route_name"="getBriefInPromo"
+ * },
+ *  "getBriefFormateurInPromo"={
+ *              "path" = "/formateurs/{id}/promos/{idPromo}/briefs/{idBrief}",
+ *              "requirements"={"id"="\d+"},
+ *              "security_message"="Vous n'avez pas access à cette Ressource",
+ *          },
+ *     "assignation"={
+ *          "method"="PUT",
+ *          "path"="/formateurs/promo/{id_promo}/brief/{id_brief}/assignation",
+ *      },
+ *      "setBriefs"={
+ *          "method"="PUT",
+ *          "path"="/formateurs/promo/{id_promo}/brief/{id_brief}",
+ *      }
+ *      
+ *
+ * }
+ * 
+ * )
  */
 class Briefs
 {
@@ -16,86 +94,128 @@ class Briefs
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfGroup:read", "brief:read"})
      */
-    private $id;
+    protected $id;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
+     * @Groups({"brief:read", "briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="string", length=255)
      */
     private $titre;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
+     * @Groups({"brief:read", "briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="string", length=255)
      */
     private $enonce;
 
     /**
+     * @Groups({"brief:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $context;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
+     * @Groups({"brief:read", "briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
 
     /**
+     * @Groups({"brief:read", "briefOfGroup:read"})
      * @ORM\Column(type="date")
      */
     private $dateEcheance;
 
     /**
+     * @Groups({"brief:read"})
      * @ORM\Column(type="string", length=255)
      */
     private $etats;
 
     /**
+     * @Groups({"brief:read"})
      * @ORM\OneToMany(targetEntity=Ressources::class, mappedBy="briefs")
      */
     private $ressources;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfGroup:read","apprenantlivable:read"})
+=======
+     * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\ManyToMany(targetEntity=Niveau::class, inversedBy="briefs")
      */
     private $niveaux;
 
     /**
+<<<<<<< HEAD
+     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read","apprenantlivable:read"})
+=======
+     * @Groups({"brief:read", "briefOfGroup:read", "briefEtat:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="briefs")
      */
     private $tags;
 
     /**
      * @ORM\ManyToOne(targetEntity=Formateur::class, inversedBy="briefs")
+     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
      */
     private $formateur;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Groupe::class, inversedBy="briefs")
-     */
-    private $groupes;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="briefs")
-     */
-    private $apprenants;
 
     /**
      * @ORM\OneToMany(targetEntity=BriefPromo::class, mappedBy="briefs")
+     * @Groups({"briefOfPromo:read"})
      */
     private $briefPromos;
 
     /**
+<<<<<<< HEAD
+     * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs", cascade={"persist"}))
+     * @Groups({"brief:read", "briefOfGroup:read", "briefOfPromo:read"})
+=======
      * @ORM\ManyToMany(targetEntity=LivrableAttendu::class, mappedBy="briefs")
+     * @Groups({"brief:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
      */
     private $livrableAttendus;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="briefs")
+<<<<<<< HEAD
+     * @Groups({"apprenantlivable:read"})
+=======
+     * @Groups({"briefOfGroup:read"})
+>>>>>>> ef767aa38279e4734bea0eec5e81555df59b180c
+     */
+    private $briefGroupe;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Referentiel::class, inversedBy="briefs")
+     */
+    private $referentiel;
 
     public function __construct()
     {
         $this->ressources = new ArrayCollection();
         $this->niveaux = new ArrayCollection();
         $this->tags = new ArrayCollection();
-        $this->groupes = new ArrayCollection();
-        $this->apprenants = new ArrayCollection();
         $this->briefPromos = new ArrayCollection();
         $this->livrableAttendus = new ArrayCollection();
     }
@@ -272,57 +392,6 @@ class Briefs
         return $this;
     }
 
-    /**
-     * @return Collection|Groupe[]
-     */
-    public function getGroupes(): Collection
-    {
-        return $this->groupes;
-    }
-
-    public function addGroupe(Groupe $groupe): self
-    {
-        if (!$this->groupes->contains($groupe)) {
-            $this->groupes[] = $groupe;
-        }
-
-        return $this;
-    }
-
-    public function removeGroupe(Groupe $groupe): self
-    {
-        if ($this->groupes->contains($groupe)) {
-            $this->groupes->removeElement($groupe);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Apprenant[]
-     */
-    public function getApprenants(): Collection
-    {
-        return $this->apprenants;
-    }
-
-    public function addApprenant(Apprenant $apprenant): self
-    {
-        if (!$this->apprenants->contains($apprenant)) {
-            $this->apprenants[] = $apprenant;
-        }
-
-        return $this;
-    }
-
-    public function removeApprenant(Apprenant $apprenant): self
-    {
-        if ($this->apprenants->contains($apprenant)) {
-            $this->apprenants->removeElement($apprenant);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|BriefPromo[]
@@ -379,6 +448,30 @@ class Briefs
             $this->livrableAttendus->removeElement($livrableAttendu);
             $livrableAttendu->removeBrief($this);
         }
+
+        return $this;
+    }
+
+    public function getBriefGroupe(): ?BriefGroupe
+    {
+        return $this->briefGroupe;
+    }
+
+    public function setBriefGroupe(?BriefGroupe $briefGroupe): self
+    {
+        $this->briefGroupe = $briefGroupe;
+
+        return $this;
+    }
+
+    public function getReferentiel(): ?Referentiel
+    {
+        return $this->referentiel;
+    }
+
+    public function setReferentiel(?Referentiel $referentiel): self
+    {
+        $this->referentiel = $referentiel;
 
         return $this;
     }

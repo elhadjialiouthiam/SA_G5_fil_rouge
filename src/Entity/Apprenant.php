@@ -52,7 +52,7 @@ class Apprenant extends User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"apprenant_competence:read",})
+     * @Groups({"ps:read"})
      */
     protected $id;
 
@@ -73,10 +73,6 @@ class Apprenant extends User
      */
         private $promos;
 
-        /**
-         * @ORM\ManyToMany(targetEntity=Briefs::class, mappedBy="apprenants")
-         */
-        private $briefs;
 
         /**
          * @ORM\OneToMany(targetEntity=LivrablesAprennant::class, mappedBy="apprenant")
@@ -101,7 +97,6 @@ class Apprenant extends User
 
         public function __construct()
         {
-            $this->briefs = new ArrayCollection();
             $this->livrablesAprennants = new ArrayCollection();
             $this->apprenantLivrablepratielles = new ArrayCollection();
             $this->competencesValides = new ArrayCollection();
@@ -147,33 +142,9 @@ class Apprenant extends User
         return $this;
     }
 
-    /**
-     * @return Collection|Briefs[]
-     */
-    public function getBriefs(): Collection
-    {
-        return $this->briefs;
-    }
 
-    public function addBrief(Briefs $brief): self
-    {
-        if (!$this->briefs->contains($brief)) {
-            $this->briefs[] = $brief;
-            $brief->addApprenant($this);
-        }
 
-        return $this;
-    }
 
-    public function removeBrief(Briefs $brief): self
-    {
-        if ($this->briefs->contains($brief)) {
-            $this->briefs->removeElement($brief);
-            $brief->removeApprenant($this);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|LivrablesAprennant[]

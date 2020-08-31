@@ -19,16 +19,16 @@ class LivrablesAprennant
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $lien;
 
-    /**
-     * @ORM\Column(type="blob")
-     */
+    // /**
+    //  * @ORM\Column(type="blob",nullable=true)
+    //  */
     private $fichier;
 
     /**

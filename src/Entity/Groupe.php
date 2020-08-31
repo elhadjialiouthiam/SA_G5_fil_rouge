@@ -69,36 +69,37 @@ class Groupe
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"briefOfGroup:read","apprenantlivable:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"groupe:read"})
+     * @Groups({"groupe:read","apprenantlivable:read"})
      */
     private $datecreation;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $statut;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:write", "groupe:read"})
+     * @Groups({"groupe:write", "groupe:read","apprenantlivable:read"})
      */
     private $type;
 
     /**
      * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="groupes")
-     * @Groups({"groupe:write", "groupe:read", "groupe_apprenants:read"})
+     * @Groups({"groupe:write", "groupe:read", "groupe_apprenants:read", "briefOfGroup:read"})
      */
     private $Apprenants;
 
@@ -119,15 +120,14 @@ class Groupe
     private $promos;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Briefs::class, mappedBy="groupes")
+     * @ORM\ManyToOne(targetEntity=BriefGroupe::class, inversedBy="groupes")
      */
-    private $briefs;
+    private $briefGroupe;
 
     public function __construct()
     {
         $this->Apprenants = new ArrayCollection();
         $this->formateurs = new ArrayCollection();
-        $this->briefs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -259,32 +259,18 @@ class Groupe
         return $this;
     }
 
-    /**
-     * @return Collection|Briefs[]
-     */
-    public function getBriefs(): Collection
+    public function getBriefGroupe(): ?BriefGroupe
     {
-        return $this->briefs;
+        return $this->briefGroupe;
     }
 
-    public function addBrief(Briefs $brief): self
+    public function setBriefGroupe(?BriefGroupe $briefGroupe): self
     {
-        if (!$this->briefs->contains($brief)) {
-            $this->briefs[] = $brief;
-            $brief->addGroupe($this);
-        }
+        $this->briefGroupe = $briefGroupe;
 
         return $this;
     }
 
-    public function removeBrief(Briefs $brief): self
-    {
-        if ($this->briefs->contains($brief)) {
-            $this->briefs->removeElement($brief);
-            $brief->removeGroupe($this);
-        }
-
-        return $this;
-    }
+    
 
 }

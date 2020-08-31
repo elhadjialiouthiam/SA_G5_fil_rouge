@@ -105,8 +105,7 @@ class Referentiel
 
     /**
      * @ORM\ManyToMany(targetEntity=GroupCompetences::class, inversedBy="referentiels",cascade={"persist"})
-     * @Groups({"ApprenantCompetence:read"})
-     * @Groups({"referentiel:read_all","promo_ref_GrpeCompet_Competences:read","promos:read","referentiel:read"})
+     * @Groups({"referentiel:read_all","promo_ref_GrpeCompet_Competences:read","promos:read","referentiel:read" ,"ApprenantCompetence:read"})
      */
     private $groupeComptence;
 
@@ -127,11 +126,17 @@ class Referentiel
      */
     private $competencesValides;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Briefs::class, mappedBy="referentiel")
+     */
+    private $briefs;
+
     public function __construct()
     {
         $this->groupeComptence = new ArrayCollection();
         $this->promos = new ArrayCollection();
         $this->competencesValides = new ArrayCollection();
+        $this->briefs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -293,6 +298,37 @@ class Referentiel
             // set the owning side to null (unless already changed)
             if ($competencesValide->getReferentiel() === $this) {
                 $competencesValide->setReferentiel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Briefs[]
+     */
+    public function getBriefs(): Collection
+    {
+        return $this->briefs;
+    }
+
+    public function addBrief(Briefs $brief): self
+    {
+        if (!$this->briefs->contains($brief)) {
+            $this->briefs[] = $brief;
+            $brief->setReferentiel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrief(Briefs $brief): self
+    {
+        if ($this->briefs->contains($brief)) {
+            $this->briefs->removeElement($brief);
+            // set the owning side to null (unless already changed)
+            if ($brief->getReferentiel() === $this) {
+                $brief->setReferentiel(null);
             }
         }
 

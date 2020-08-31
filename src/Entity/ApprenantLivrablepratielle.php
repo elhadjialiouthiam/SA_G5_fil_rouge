@@ -17,26 +17,31 @@ class ApprenantLivrablepratielle
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"apprenantlivable:read"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"apprenantlivable:read"})
      */
     private $etat;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"apprenantlivable:read"})
      */
     private $delai;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"apprenantlivable:read"})
      */
     private $dateRendu;
 
     /**
      * @ORM\ManyToOne(targetEntity=LivrablesPartiels::class, inversedBy="apprenantLivrablepratielles")
+     * @Groups({"apprenantlivable:read"})
      */
     private $livrablesPartiels;
 
