@@ -747,7 +747,7 @@ class PromosController extends AbstractController
                     $email,
                     $mailer
                 );
-             } 
+             }
         } 
         return $this->json("Ajouté");
 }
